@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "RevitCleaner (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "RevitCleaner (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}
