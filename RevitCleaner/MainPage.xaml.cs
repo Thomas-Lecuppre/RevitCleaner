@@ -83,7 +83,7 @@ namespace RevitCleaner
             }
             else
             {
-                mainWindow.Process();
+                DeleteSelectedFiles();
                 DeleteFilesButton.Content = "Nettoyer mes fichiers";
             }
         }
