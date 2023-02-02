@@ -64,15 +64,16 @@ namespace RevitCleaner
         {
             // Si le filtre est convenable.
             string s = SearchTextBox.Text;
-            if (string.IsNullOrEmpty(s) && !s.Contains('\\'))
+            if (!string.IsNullOrWhiteSpace(s))
             {
                 // On filtre ici la liste.
+                ParseFilesToUI(DirectoryTextBox.Text, SearchTextBox.Text, CaseSensitiveToggleSwitch.IsOn);
             }
         }
 
         private void CaseSensitiveToggleSwitch_Toggled(object sender, RoutedEventArgs e)
         {
-
+            ParseFilesToUI(DirectoryTextBox.Text, SearchTextBox.Text, CaseSensitiveToggleSwitch.IsOn);
         }
 
         private void DeleteFilesButton_Click(object sender, RoutedEventArgs e)
@@ -93,16 +94,16 @@ namespace RevitCleaner
             if (Directory.Exists(DirectoryTextBox.Text))
             {
                 // Looking for all the files in folder.
-
                 ParseFilesToUI(DirectoryTextBox.Text, SearchTextBox.Text, CaseSensitiveToggleSwitch.IsOn);
             }
         }
 
-        public int CountExtanded()
+        public void CountExtanded()
         {
-            return FilesTreeView.SelectedItems.Count;
+            int count = FilesTreeView.SelectedItems.Count;
+            if (count <= 1) SelectionInformationBlock.Text = $"{count} élément selectionné.";
+            else SelectionInformationBlock.Text = $"{count} éléments selectionnés.";
         }
-
 
         #region Files Analysis
 
@@ -225,6 +226,8 @@ namespace RevitCleaner
             {
                 mainDir.Children.Add(item);
             }
+
+            CountExtanded();
         }
 
         /// <summary>
@@ -308,7 +311,6 @@ namespace RevitCleaner
 
         #endregion
 
-
         /// <summary>
         /// Fonction de teste qui permet de tester différents processus de manipulation des listes 
         /// et collections dans winui3.
@@ -324,13 +326,18 @@ namespace RevitCleaner
                 }
                 else
                 {
-                    try
+                    if (child.IsSelected && File.Exists(child.Path))
                     {
-                        File.Delete(child.Path);
+                        try
+                        {
+                            File.Delete(child.Path);
+                        }
+                        catch { }
                     }
-                    catch { }
                 }
             }
+
+            ParseFilesToUI(DirectoryTextBox.Text, SearchTextBox.Text, CaseSensitiveToggleSwitch.IsOn);
         }
 
         private void DeleteSelectedFiles(ExplorerItem item)
@@ -343,11 +350,14 @@ namespace RevitCleaner
                 }
                 else
                 {
-                    try
+                    if(child.IsSelected && File.Exists(child.Path))
                     {
-                        File.Delete(child.Path);
+                        try
+                        {
+                            File.Delete(child.Path);
+                        }
+                        catch { }
                     }
-                    catch { }
                 }
             }
         }

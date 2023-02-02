@@ -150,6 +150,8 @@
                 Height="*" />
             <RowDefinition
                 Height="auto" />
+            <RowDefinition
+                Height="auto" />
         </Grid.RowDefinitions>
 
         <!--#region Ligne saisie dossier-->
@@ -234,9 +236,15 @@
             VerticalAlignment="Top"
             />
 
+        <TextBlock
+            x:Name="SelectionInformationBlock"
+            Grid.Row="4"
+            HorizontalAlignment="Left"
+            Text="0 élément selectionné." />
+
         <Button
             x:Name="DeleteFilesButton"
-            Grid.Row="4"
+            Grid.Row="5"
             HorizontalAlignment="Center"
             Background="{ThemeResource SystemAccentColorDark1}"
             Content="Nettoyer mes fichiers"

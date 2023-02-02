@@ -13,7 +13,7 @@
 		<DefaultLanguage>fr-FR</DefaultLanguage>
 		<ApplicationIcon>RFA_Cleaner_32px.ico</ApplicationIcon>
 		<Nullable>disable</Nullable>
-		<GenerateAppInstallerFile>True</GenerateAppInstallerFile>
+		<GenerateAppInstallerFile>False</GenerateAppInstallerFile>
 		<AppxPackageSigningEnabled>True</AppxPackageSigningEnabled>
 		<PackageCertificateThumbprint>6981A0ACA6AE5F36C8A3E0F4F9573E36346DBD42</PackageCertificateThumbprint>
 		<AppxPackageSigningTimestampDigestAlgorithm>SHA256</AppxPackageSigningTimestampDigestAlgorithm>
