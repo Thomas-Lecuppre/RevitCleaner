@@ -5,6 +5,7 @@
     xmlns:local="using:RevitCleaner"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    d:DataContext="{d:DesignInstance Type=local:MainPageViewModel}"
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
     Margin="0,14,0,0">
@@ -17,7 +18,8 @@
             <TreeViewItem
                 AutomationProperties.Name="{x:Bind Name}"
                 ItemsSource="{x:Bind Children}"
-                IsExpanded="True">
+                IsExpanded="{x:Bind IsExpanded,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                IsSelected="{x:Bind IsSelected,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
                 <StackPanel
                     Orientation="Horizontal">
                     <Image
@@ -33,7 +35,9 @@
             x:Key="RFAFileTemplate"
             x:DataType="local:ExplorerItem">
             <TreeViewItem
-                AutomationProperties.Name="{x:Bind Name}">
+                AutomationProperties.Name="{x:Bind Name}"
+                IsExpanded="{x:Bind IsExpanded,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                IsSelected="{x:Bind IsSelected,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
                 <StackPanel
                     Orientation="Horizontal">
                     <Image
@@ -49,7 +53,9 @@
             x:Key="RFTFileTemplate"
             x:DataType="local:ExplorerItem">
             <TreeViewItem
-                AutomationProperties.Name="{x:Bind Name}">
+                AutomationProperties.Name="{x:Bind Name}"
+                IsExpanded="{x:Bind IsExpanded,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                IsSelected="{x:Bind IsSelected,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
                 <StackPanel
                     Orientation="Horizontal">
                     <Image
@@ -65,7 +71,9 @@
             x:Key="RTEFileTemplate"
             x:DataType="local:ExplorerItem">
             <TreeViewItem
-                AutomationProperties.Name="{x:Bind Name}">
+                AutomationProperties.Name="{x:Bind Name}"
+                IsExpanded="{x:Bind IsExpanded,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                IsSelected="{x:Bind IsSelected,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
                 <StackPanel
                     Orientation="Horizontal">
                     <Image
@@ -81,7 +89,9 @@
             x:Key="RVTFileTemplate"
             x:DataType="local:ExplorerItem">
             <TreeViewItem
-                AutomationProperties.Name="{x:Bind Name}">
+                AutomationProperties.Name="{x:Bind Name}"
+                IsExpanded="{x:Bind IsExpanded,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                IsSelected="{x:Bind IsSelected,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
                 <StackPanel
                     Orientation="Horizontal">
                     <Image
@@ -97,7 +107,9 @@
             x:Key="UnknowFileTemplate"
             x:DataType="local:ExplorerItem">
             <TreeViewItem
-                AutomationProperties.Name="{x:Bind Name}">
+                AutomationProperties.Name="{x:Bind Name}"
+                IsExpanded="{x:Bind IsExpanded,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                IsSelected="{x:Bind IsSelected,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
                 <StackPanel
                     Orientation="Horizontal">
                     <Image
@@ -156,20 +168,25 @@
             </Grid.ColumnDefinitions>
 
             <TextBox
+                x:Name="DirectoryTextBox"
                 Grid.Column="0"
                 HorizontalTextAlignment="Left"
                 VerticalContentAlignment="Center"
                 HorizontalAlignment="Stretch"
                 Text="{Binding SearchDirectory}"
-                PlaceholderText="Dossier de recherche" />
+                Header="Dossier de recherche :"
+                PlaceholderText="C:\..." 
+                TextChanged="DirectoryTextBox_TextChanged"
+                ToolTipService.ToolTip="Indiquez le dossier dans lequel chercher les éléments à nettoyer."/>
 
             <Button
                 x:Name="SearchButton"
                 Grid.Column="1"
                 HorizontalAlignment="Stretch"
-                VerticalAlignment="Stretch"
+                VerticalAlignment="Bottom"
                 ClickMode="Release"
-                Click="SearchButton_Click">
+                Click="SearchButton_Click"
+                ToolTipService.ToolTip="Ouvrir un explorateur de dossier.">
                 <SymbolIcon
                     Symbol="More" />
             </Button>
@@ -184,7 +201,9 @@
             x:Name="SearchTextBox"
             Grid.Row="1"
             Margin="10,0"
-            PlaceholderText="Recherche :"
+            Header="Filtre de recherche :"
+            PlaceholderText="Project, Modèle générique, @Etudes"
+            ToolTipService.ToolTip="Utilisez '@' pour filtrer sur un nom de dossier. Utilisez ',' pour séparer vos recherches."
             TextChanged="SearchTextBox_TextChanged" />
 
 
@@ -210,15 +229,17 @@
             Grid.Row="3"
             SelectionMode="Multiple"
             ItemTemplateSelector="{StaticResource ExplorerItemTemplateSelector}"
+            ItemsSource="{Binding ExplorerItems, Mode=TwoWay}"
             HorizontalAlignment="Stretch"
-            VerticalAlignment="Top" />
+            VerticalAlignment="Top"
+            />
 
         <Button
             x:Name="DeleteFilesButton"
             Grid.Row="4"
             HorizontalAlignment="Center"
             Background="{ThemeResource SystemAccentColorDark1}"
-            Content="Nettoyer mes fichiers."
+            Content="Nettoyer mes fichiers"
             ClickMode="Release"
             Click="DeleteFilesButton_Click"
             ToolTipService.ToolTip="Cette action est irréversible. Réfléchissez avant de cliquer." />

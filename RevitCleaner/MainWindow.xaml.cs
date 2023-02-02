@@ -27,12 +27,16 @@ namespace RevitCleaner
     /// </summary>
     public sealed partial class MainWindow : Window
     {
+        private MainPageViewModel _MainPageViewModel { get; set; }
+
         public MainWindow()
         {
             this.InitializeComponent();
 
+            // Initialisation des vues modèle.
             FilesListPage.mainWindow = this;
 
+            // Mise à jour de la barre de titre est de l'entête.
             Assembly a = Assembly.GetExecutingAssembly();
             FileVersionInfo fvi = FileVersionInfo.GetVersionInfo(a.Location);
 
@@ -40,52 +44,6 @@ namespace RevitCleaner
             ExtendsContentIntoTitleBar = true;
 
             SetTitleBar(TitleBar);
-
-            FilesListPage.Visibility = Visibility.Visible;
-            LoadingPage.Visibility = Visibility.Collapsed;
-        }
-
-        public void Process()
-        {
-            FilesListPage.Visibility = Visibility.Collapsed;
-            LoadingPage.Visibility = Visibility.Visible;
-
-            Task.Run(() => Test());
-        }
-
-        private void Test()
-        {
-
-            LoadingPage.UpdateLoadingRing(true, false, 100, 0);
-
-            for (int i = 0; i <= 100; i++)
-            {
-                Thread.Sleep(50);
-
-                LoadingPage.UpdateLoadingRing(true, false, 100, i);
-                LoadingPage.UpdateTextBox($"Suppression {i}/100");
-            }
-
-
-            LoadingPage.UpdateLoadingRing(true, true, 100, 0);
-
-            Thread.Sleep(5000);
-
-            if (this.DispatcherQueue.HasThreadAccess)
-            {
-                FilesListPage.Visibility = Visibility.Visible;
-                LoadingPage.Visibility = Visibility.Collapsed;
-            }
-            else
-            {
-                this.DispatcherQueue.TryEnqueue(
-                    Microsoft.UI.Dispatching.DispatcherQueuePriority.Normal,
-                    () =>
-                    {
-                        FilesListPage.Visibility = Visibility.Visible;
-                        LoadingPage.Visibility = Visibility.Collapsed;
-                    });
-            }
         }
 
     }

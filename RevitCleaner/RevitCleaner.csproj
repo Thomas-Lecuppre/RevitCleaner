@@ -15,7 +15,6 @@
 		<Nullable>disable</Nullable>
 	</PropertyGroup>
 	<ItemGroup>
-	  <None Remove="ExecutionPage.xaml" />
 	  <None Remove="MainPage.xaml" />
 	</ItemGroup>
 
@@ -38,10 +37,10 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.0.0" />
-		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
-		<PackageReference Include="Microsoft.WindowsAppSDK" Version="1.1.5" />
-		<PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.22621.1" />
+		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.1.0" />
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
+		<PackageReference Include="Microsoft.WindowsAppSDK" Version="1.2.230118.102" />
+		<PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.22621.755" />
 		<Manifest Include="$(ApplicationManifest)" />
 	</ItemGroup>
 
@@ -54,9 +53,7 @@
 		<ProjectCapability Include="Msix" />
 	</ItemGroup>
 	<ItemGroup>
-	  <Page Update="ExecutionPage.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </Page>
+	  <ProjectReference Include="..\RevitCleaner.Core\RevitCleaner.Core.csproj" />
 	</ItemGroup>
 	<ItemGroup>
 	  <Page Update="MainPage.xaml">

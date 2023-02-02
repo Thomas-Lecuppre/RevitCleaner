@@ -39,10 +39,8 @@
 
         <!--#endregion-->
 
-        <local:MainPage 
-            x:Name="FilesListPage"/>
-        
-        <local:ExecutionPage x:Name="LoadingPage"/>
+        <local:MainPage
+            x:Name="FilesListPage" />
 
     </Grid>
 </Window>
