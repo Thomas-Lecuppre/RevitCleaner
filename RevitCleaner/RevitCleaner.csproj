@@ -53,9 +53,6 @@
 		<ProjectCapability Include="Msix" />
 	</ItemGroup>
 	<ItemGroup>
-	  <ProjectReference Include="..\RevitCleaner.Core\RevitCleaner.Core.csproj" />
-	</ItemGroup>
-	<ItemGroup>
 	  <Page Update="MainPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </Page>
