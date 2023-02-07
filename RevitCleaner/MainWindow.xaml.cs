@@ -27,14 +27,12 @@ namespace RevitCleaner
     /// </summary>
     public sealed partial class MainWindow : Window
     {
-        private MainPageViewModel _MainPageViewModel { get; set; }
-
         public MainWindow()
         {
             this.InitializeComponent();
 
             // Initialisation des vues modèle.
-            FilesListPage.mainWindow = this;
+            FilesListPage.MainWindowView = this;
 
             // Mise à jour de la barre de titre est de l'entête.
             Assembly a = Assembly.GetExecutingAssembly();

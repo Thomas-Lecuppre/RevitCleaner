@@ -15,6 +15,7 @@ using System.Reflection.Metadata;
 using System.Reflection;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
+using System.Security.Permissions;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.Storage.Pickers;
@@ -32,8 +33,11 @@ namespace RevitCleaner
     /// </summary>
     public sealed partial class MainPage : Page
     {
-        public MainWindow mainWindow { get; set; }
+        public MainWindow MainWindowView { get; set; }
         public MainPageViewModel ViewModel { get; set; }
+        private List<string> DirectoryFilter { get; set; }
+        private List<string> FileFilter { get; set; }
+        private bool IsCaseSensitive { get; set; }
 
         public MainPage()
         {
@@ -42,6 +46,12 @@ namespace RevitCleaner
             // New ViewModel parse to Page DataContext
             ViewModel= new MainPageViewModel();
             this.DataContext = ViewModel;
+
+            DirectoryFilter = new List<string>();
+            FileFilter = new List<string>();
+
+            CaseSensitiveToggleSwitch.IsOn = true;
+            UpDateFilterData();
         }
 
         private async void SearchButton_Click(object sender, RoutedEventArgs e)
@@ -49,7 +59,7 @@ namespace RevitCleaner
             FolderPicker picker = new();
             picker.SuggestedStartLocation = PickerLocationId.DocumentsLibrary;
 
-            var hwnd = WindowNative.GetWindowHandle(mainWindow);
+            var hwnd = WindowNative.GetWindowHandle(MainWindowView);
             InitializeWithWindow.Initialize(picker, hwnd);
 
             StorageFolder dir = await picker.PickSingleFolderAsync();
@@ -62,18 +72,14 @@ namespace RevitCleaner
 
         private void SearchTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            // Si le filtre est convenable.
-            string s = SearchTextBox.Text;
-            if (!string.IsNullOrWhiteSpace(s))
-            {
-                // On filtre ici la liste.
-                ParseFilesToUI(DirectoryTextBox.Text, SearchTextBox.Text, CaseSensitiveToggleSwitch.IsOn);
-            }
+            UpDateFilterData();
+            ParseFilesToUI(DirectoryTextBox.Text);
         }
 
         private void CaseSensitiveToggleSwitch_Toggled(object sender, RoutedEventArgs e)
         {
-            ParseFilesToUI(DirectoryTextBox.Text, SearchTextBox.Text, CaseSensitiveToggleSwitch.IsOn);
+            UpDateFilterData();
+            ParseFilesToUI(DirectoryTextBox.Text);
         }
 
         private void DeleteFilesButton_Click(object sender, RoutedEventArgs e)
@@ -94,7 +100,13 @@ namespace RevitCleaner
             if (Directory.Exists(DirectoryTextBox.Text))
             {
                 // Looking for all the files in folder.
-                ParseFilesToUI(DirectoryTextBox.Text, SearchTextBox.Text, CaseSensitiveToggleSwitch.IsOn);
+                UpDateFilterData();
+                ParseFilesToUI(DirectoryTextBox.Text);
+            }
+            else
+            {
+                // Clearing existing UI items.
+                ViewModel.ExplorerItems.Clear();
             }
         }
 
@@ -106,6 +118,59 @@ namespace RevitCleaner
         }
 
         #region Files Analysis
+
+        /// <summary>
+        /// Return a list of FileInfo that are Revit files and saved files. All other file type will be ignored.
+        /// </summary>
+        /// <param name="folderPath">Path to folder where to search.</param>
+        /// <returns>List of FileInfo that are Revit and saved files.</returns>
+        private List<FileInfo> GetFiles(string folderPath, bool allDir)
+        {
+            DirectoryInfo dir = new DirectoryInfo(folderPath);
+            List<FileInfo> files = allDir ? dir.GetFiles("*", SearchOption.AllDirectories).ToList() : dir.GetFiles("*", SearchOption.TopDirectoryOnly).ToList();
+            List<FileInfo> validFiles = new List<FileInfo>();
+
+            foreach(FileInfo fi in files)
+            {
+                // If not revit file and not a saved file then go to the next.
+                if (!IsRevitFile(fi.Extension)) continue;
+                if (!IsSaveFile(fi.FullName)) continue;
+                // There is no filter, simply add file to the list.
+                if (DirectoryFilter.Count <= 0 && FileFilter.Count <= 0)
+                {
+                    validFiles.Add(fi);
+                    continue;
+                }
+
+                string filePath = IsCaseSensitive ? fi.DirectoryName : fi.DirectoryName.ToLowerInvariant();
+                string fileName = fi.Name.Replace(fi.Extension, "");
+                fileName = IsCaseSensitive ? fileName : fileName.ToLowerInvariant();
+                List<bool> filterResult = new List<bool>();
+
+                foreach(string d in DirectoryFilter)
+                {
+                    string str = IsCaseSensitive ? d : d.ToLowerInvariant();
+                    filterResult.Add(filePath.Contains(str));
+                }
+
+                // If all directory filter aren't correct then pass to the next file.
+                if (filterResult.Where(x => x == true).Count() != DirectoryFilter.Count) continue;
+
+                filterResult.Clear();
+
+                foreach (string d in FileFilter)
+                {
+                    string str = IsCaseSensitive ? d : d.ToLowerInvariant();
+                    filterResult.Add(fileName.Contains(str));
+                }
+
+                // If all file name filter are correct then add the file to valid list.
+                if (filterResult.Where(x => x == true).Count() == FileFilter.Count) validFiles.Add(fi);
+
+            }
+
+            return validFiles;
+        }
 
         /// <summary>
         /// Détermine si l'extension est une extension Revit.
@@ -129,16 +194,32 @@ namespace RevitCleaner
             if (string.IsNullOrEmpty(fileName)) return false;
             if (!fileName.Contains('.')) return false;
 
-            string lastComponent = file.Substring(fileName.LastIndexOf("."));
+            string lastComponent = fileName.Substring(fileName.LastIndexOf(".") + 1);
 
             if (lastComponent.Length != 4) return false;
-            if (int.TryParse(lastComponent, out int i)) return true;
-            else return false;
+            return int.TryParse(lastComponent, out int i);
+        }
+
+        private void UpDateFilterData()
+        {
+            IsCaseSensitive = CaseSensitiveToggleSwitch.IsOn;
+            string filter = SearchTextBox.Text;
+            if (string.IsNullOrEmpty(filter))
+            {
+                DirectoryFilter.Clear();
+                FileFilter.Clear();
+            }
+            else
+            {
+                DirectoryFilter = GetFolderFilter(filter);
+                FileFilter = GetFileFilter(filter);
+            }
         }
 
         private List<string> GetFolderFilter(string filter)
         {
             List<string> folders = new List<string>();
+            if (string.IsNullOrWhiteSpace(filter)) return folders;
             if (!filter.Contains('@')) return folders;
 
             if (filter.Contains(','))
@@ -195,21 +276,15 @@ namespace RevitCleaner
         /// <param name="folderPath">Chemin du dossier inital.</param>
         /// <param name="filter">Filtre de recherche.</param>
         /// <param name="caseSensitive">La recherche est-elle sensible à la casse ?</param>
-        public void ParseFilesToUI(string folderPath, string filter, bool caseSensitive)
+        public void ParseFilesToUI(string folderPath)
         {
-            // Si le dossier choisit n'existe pas alors on ne cherche pas.
-            if (!Directory.Exists(folderPath))
-            {
-                return;
-            }
+            // If directory doesn't exist then exit.
+            if (!Directory.Exists(folderPath)) return;
 
-            List<string> folderFilter = GetFolderFilter(filter);
-            List<string> fileFilter = GetFileFilter(filter);
-
-            // Réinitialisation des noeuds précédents.
+            // Clearing existing UI items.
             ViewModel.ExplorerItems.Clear();
 
-            // On ajoute le dossier de recherche comme premier noeud.
+            // Add main directory as root folder in treeview.
             ExplorerItem mainDir = new ExplorerItem()
             {
                 Name = new DirectoryInfo(folderPath).Name,
@@ -222,7 +297,7 @@ namespace RevitCleaner
             ViewModel.ExplorerItems.Add(mainDir);
 
             // Pour chaque dossier du dossier on l'affiche dans l'arbre de la page principale.
-            foreach (ExplorerItem item in FilesInFolder(folderPath, folderFilter, fileFilter, caseSensitive, false))
+            foreach (ExplorerItem item in FilesInFolder(folderPath, false))
             {
                 mainDir.Children.Add(item);
             }
@@ -238,75 +313,106 @@ namespace RevitCleaner
         /// <param name="caseSensitive">La recherche est-elle sensible à la casse ?</param>
         /// <param name="isExpanded">Le noeud doit-il être étendu ?</param>
         /// <returns>Une liste de noeuds.</returns>
-        private ObservableCollection<ExplorerItem> FilesInFolder(string folderPath, List<string> foldersFilter, List<string> namesFilter, bool caseSensitive, bool isExpanded)
+        private ObservableCollection<ExplorerItem> FilesInFolder(string folderPath, bool isExpanded)
         {
+            // Initializing list
             ObservableCollection<ExplorerItem> list = new ObservableCollection<ExplorerItem>();
+            string[] subDirs = new string[] { };
 
-            // Ajout des dossiers.
-            foreach (string dir in Directory.GetDirectories(folderPath))
+            // Trying to get sub directory.
+            // This was done like this because on the author pc, a direcotry was found whereas it doesn't exist on the pc.
+            // If that occure again, application won't crash.
+            try
             {
-                ExplorerItem d = new ExplorerItem()
-                {
-                    Name = new DirectoryInfo(dir).Name,
-                    Path = dir,
-                    IsExpanded = isExpanded,
-                    Type = ExplorerItem.ExplorerItemType.Folder
-                };
+                subDirs = Directory.GetDirectories(folderPath);
+            }
+            catch (FieldAccessException faex)
+            {
+                return list;
+            }
+            catch (Exception ex)
+            {
+                return list;
+            }
+            finally { }
 
+            // Add folder to treeview if it contain children.
+            // Because this method turn in a loop from top directory to the farest one, if there is no child there is no file
+            // so we don't need to show this.
+            foreach (string dir in subDirs)
+            {
+                ObservableCollection<ExplorerItem> dirFiles = FilesInFolder(dir, false);
 
-                foreach (ExplorerItem item in FilesInFolder(dir, foldersFilter, namesFilter, caseSensitive, false))
+                // Directory and subdirectoies contain at least 1 save file so we add the folder.
+                if (dirFiles != null && dirFiles.Count > 0)
                 {
-                    //LoadingPage.UpdateTextBox($"Ajout de {item.Name}.");
-                    d.Children.Add(item);
+                    ExplorerItem d = new ExplorerItem()
+                    {
+                        Name = new DirectoryInfo(dir).Name,
+                        Path = dir,
+                        IsExpanded = isExpanded,
+                        Type = ExplorerItem.ExplorerItemType.Folder
+                    };
+
+                    // Repeating the process.
+                    foreach (ExplorerItem item in dirFiles)
+                    {
+                        d.Children.Add(item);
+                    }
+
+                    list.Add(d);
                 }
-
-                list.Add(d);
             }
 
-            // Ajout des fichiers.
-            foreach (string file in Directory.GetFiles(folderPath))
+            // Get Files in current root folder.
+            List<FileInfo> curDirFiles = GetFiles(folderPath, false);
+            // Add them in UI
+            foreach (FileInfo fi in curDirFiles)
             {
                 ExplorerItem item = new ExplorerItem()
                 {
-                    Name = Path.GetFileNameWithoutExtension(file),
-                    Path = file,
+                    Name = fi.Name.Replace(fi.Extension, ""),
+                    Path = fi.FullName,
                 };
-
-                string ext = Path.GetExtension(file);
-
-                // Défini l'icone pour chaque fichier. Si le fichier ne correspond pas au cas indiqué alors on le passe.
-                switch (ext)
-                {
-                    case ".rfa":
-                        {
-                            item.Type = ExplorerItem.ExplorerItemType.RFAFile;
-                            break;
-                        }
-                    case ".rft":
-                        {
-                            item.Type = ExplorerItem.ExplorerItemType.RFTFile;
-                            break;
-                        }
-                    case ".rte":
-                        {
-                            item.Type = ExplorerItem.ExplorerItemType.RTEFile;
-                            break;
-                        }
-                    case ".rvt":
-                        {
-                            item.Type = ExplorerItem.ExplorerItemType.RVTFile;
-                            break;
-                        }
-                    default:
-                        {
-                            continue;
-                        }
-                }
+                item.Type = GetUIFileType(fi);
 
                 list.Add(item);
             }
 
             return list;
+        }
+
+        /// <summary>
+        /// Return an Explorer Item Type according to the file extension.
+        /// </summary>
+        /// <param name="file">The target file.</param>
+        /// <returns>An Explorer Item Type</returns>
+        private ExplorerItem.ExplorerItemType GetUIFileType(FileInfo file)
+        {
+            // Choose icon in funtion of file type.
+            switch (file.Extension)
+            {
+                case ".rfa":
+                    {
+                        return ExplorerItem.ExplorerItemType.RFAFile;
+                    }
+                case ".rft":
+                    {
+                        return ExplorerItem.ExplorerItemType.RFTFile;
+                    }
+                case ".rte":
+                    {
+                        return ExplorerItem.ExplorerItemType.RTEFile;
+                    }
+                case ".rvt":
+                    {
+                        return ExplorerItem.ExplorerItemType.RVTFile;
+                    }
+                default:
+                    {
+                        return ExplorerItem.ExplorerItemType.UnknowFile;
+                    }
+            }
         }
 
         #endregion
@@ -337,7 +443,8 @@ namespace RevitCleaner
                 }
             }
 
-            ParseFilesToUI(DirectoryTextBox.Text, SearchTextBox.Text, CaseSensitiveToggleSwitch.IsOn);
+            UpDateFilterData();
+            ParseFilesToUI(DirectoryTextBox.Text);
         }
 
         private void DeleteSelectedFiles(ExplorerItem item)
