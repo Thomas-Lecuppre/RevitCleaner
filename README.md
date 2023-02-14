@@ -1,4 +1,2 @@
-# RevitCleaner
-Version de RFACleaner basé sur WINUI3
-
-Version mise à jour de RFA Cleaner (basé sur WPF). De gros ajouts sont à venir.
+# RevitCleaner (FR)
+RevitCleaner est le successeur de RFACleaner. C'est une application basée sur WinUI 3 et qui offre la possibilité de rapidement et efficacement supprimer des fichiers de sauvegarde générés par le logiciel Revit.
