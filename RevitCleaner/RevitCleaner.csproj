@@ -20,9 +20,11 @@
 		<AppxAutoIncrementPackageRevision>True</AppxAutoIncrementPackageRevision>
 		<AppxSymbolPackageEnabled>False</AppxSymbolPackageEnabled>
 		<GenerateTestArtifacts>True</GenerateTestArtifacts>
-		<AppxBundle>Never</AppxBundle>
+		<AppxBundle>Always</AppxBundle>
 		<AppInstallerUri>https://thomas-lecuppre.fr</AppInstallerUri>
 		<HoursBetweenUpdateChecks>0</HoursBetweenUpdateChecks>
+		<AppxPackageDir>C:\Users\thoma\source\repos\RevitCleaner\RevitCleaner\_Publish\</AppxPackageDir>
+		<AppxBundlePlatforms>x64</AppxBundlePlatforms>
 	</PropertyGroup>
 	<ItemGroup>
 	  <None Remove="MainPage.xaml" />
