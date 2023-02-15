@@ -153,6 +153,16 @@
             <RowDefinition
                 Height="auto" />
         </Grid.RowDefinitions>
+        
+        <!--#region Alertes-->
+
+        <StackPanel
+            x:Name="AlertPanel"
+            Grid.ColumnSpan="10"
+            Grid.RowSpan="10"
+            Margin="10" />
+
+        <!--#endregion-->
 
         <!--#region Ligne saisie dossier-->
 

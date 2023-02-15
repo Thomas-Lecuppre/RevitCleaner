@@ -415,6 +415,34 @@ namespace RevitCleaner
             }
         }
 
+        private void AddError(string title, string message, InfoBarSeverity infoBarSeverity)
+        {
+            InfoBar ib = new InfoBar()
+            {
+                Title = title,
+                Message = message,
+                Severity = infoBarSeverity
+            };
+
+            AlertPanel.Children.Add(ib);
+            AutomaticallyCloseAlerte(ib);
+        }
+
+        private void ClearError()
+        {
+            AlertPanel.Children.Clear();
+        }
+
+        private void AutomaticallyCloseAlerte(InfoBar infoBar)
+        {
+            Task.Run(() =>
+            {
+                Thread.Sleep(5000);
+                infoBar.IsOpen= false;
+                AlertPanel.Children.Remove(infoBar);
+            });
+        }
+
         #endregion
 
         /// <summary>
