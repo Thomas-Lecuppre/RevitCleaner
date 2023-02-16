@@ -22,6 +22,8 @@ using Windows.Storage.Pickers;
 using Windows.Storage;
 using WinRT.Interop;
 using System.Threading;
+using System.Reflection.Metadata.Ecma335;
+using Windows.Media.Core;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -90,6 +92,7 @@ namespace RevitCleaner
             }
             else
             {
+                ClearInfoMessage();
                 DeleteSelectedFiles();
                 DeleteFilesButton.Content = "Nettoyer mes fichiers";
             }
@@ -110,11 +113,10 @@ namespace RevitCleaner
             }
         }
 
-        public void CountExtanded()
+        public void CountSelected()
         {
             int count = FilesTreeView.SelectedItems.Count;
-            if (count <= 1) SelectionInformationBlock.Text = $"{count} élément selectionné.";
-            else SelectionInformationBlock.Text = $"{count} éléments selectionnés.";
+            AddInfoMessage("Debug", count.ToString(), InfoBarSeverity.Informational);
         }
 
         #region Files Analysis
@@ -142,14 +144,14 @@ namespace RevitCleaner
                     continue;
                 }
 
-                string filePath = IsCaseSensitive ? fi.DirectoryName : fi.DirectoryName.ToLowerInvariant();
+                string filePath = IsCaseSensitive ? fi.DirectoryName : fi.DirectoryName.ToLower();
                 string fileName = fi.Name.Replace(fi.Extension, "");
-                fileName = IsCaseSensitive ? fileName : fileName.ToLowerInvariant();
+                fileName = IsCaseSensitive ? fileName : fileName.ToLower();
                 List<bool> filterResult = new List<bool>();
 
                 foreach(string d in DirectoryFilter)
                 {
-                    string str = IsCaseSensitive ? d : d.ToLowerInvariant();
+                    string str = IsCaseSensitive ? d : d.ToLower();
                     filterResult.Add(filePath.Contains(str));
                 }
 
@@ -160,7 +162,7 @@ namespace RevitCleaner
 
                 foreach (string d in FileFilter)
                 {
-                    string str = IsCaseSensitive ? d : d.ToLowerInvariant();
+                    string str = IsCaseSensitive ? d : d.ToLower();
                     filterResult.Add(fileName.Contains(str));
                 }
 
@@ -257,7 +259,7 @@ namespace RevitCleaner
                 string[] component = filter.Split(',');
                 foreach (string s in component)
                 {
-                    if (s.StartsWith("@")) files.Add(s.Trim());
+                    if (!s.StartsWith("@")) files.Add(s.Trim());
                 }
             }
             else if (!filter.StartsWith("@")) files.Add(filter.Trim());
@@ -297,12 +299,12 @@ namespace RevitCleaner
             ViewModel.ExplorerItems.Add(mainDir);
 
             // Pour chaque dossier du dossier on l'affiche dans l'arbre de la page principale.
-            foreach (ExplorerItem item in FilesInFolder(folderPath, false))
+            foreach (ExplorerItem item in FilesInFolder(folderPath, true))
             {
                 mainDir.Children.Add(item);
             }
 
-            CountExtanded();
+            CountSelected();
         }
 
         /// <summary>
@@ -326,12 +328,18 @@ namespace RevitCleaner
             {
                 subDirs = Directory.GetDirectories(folderPath);
             }
-            catch (FieldAccessException faex)
+            catch (DirectoryNotFoundException dnfex)
             {
+                AddInfoMessage("Directory Not Found Exception", dnfex.Message, InfoBarSeverity.Warning);
+            }
+            catch (IOException ioex)
+            {
+                AddInfoMessage("IO Exception", ioex.Message, InfoBarSeverity.Error);
                 return list;
             }
             catch (Exception ex)
             {
+                AddInfoMessage("Exception", ex.Message, InfoBarSeverity.Error);
                 return list;
             }
             finally { }
@@ -341,7 +349,7 @@ namespace RevitCleaner
             // so we don't need to show this.
             foreach (string dir in subDirs)
             {
-                ObservableCollection<ExplorerItem> dirFiles = FilesInFolder(dir, false);
+                ObservableCollection<ExplorerItem> dirFiles = FilesInFolder(dir, true);
 
                 // Directory and subdirectoies contain at least 1 save file so we add the folder.
                 if (dirFiles != null && dirFiles.Count > 0)
@@ -350,6 +358,7 @@ namespace RevitCleaner
                     {
                         Name = new DirectoryInfo(dir).Name,
                         Path = dir,
+                        IsSelected = true,
                         IsExpanded = isExpanded,
                         Type = ExplorerItem.ExplorerItemType.Folder
                     };
@@ -373,6 +382,8 @@ namespace RevitCleaner
                 {
                     Name = fi.Name.Replace(fi.Extension, ""),
                     Path = fi.FullName,
+                    IsSelected = true,
+                    IsExpanded = isExpanded
                 };
                 item.Type = GetUIFileType(fi);
 
@@ -415,31 +426,145 @@ namespace RevitCleaner
             }
         }
 
-        private void AddError(string title, string message, InfoBarSeverity infoBarSeverity)
+        /// <summary>
+        /// Handle the error as an InfoBar direclty in UI.
+        /// </summary>
+        /// <param name="title">Title of message.</param>
+        /// <param name="message">Message.</param>
+        /// <param name="infoBarSeverity">The severity level.</param>
+        private void AddInfoMessage(string title, string message, InfoBarSeverity infoBarSeverity)
         {
             InfoBar ib = new InfoBar()
             {
                 Title = title,
                 Message = message,
-                Severity = infoBarSeverity
+                Severity = infoBarSeverity,
+                IsOpen = true
             };
+            ProgressBar pb = new ProgressBar();
 
+            ib.Content = pb;
             AlertPanel.Children.Add(ib);
-            AutomaticallyCloseAlerte(ib);
+            AutomaticallyCloseAlerte(ib, pb);
         }
 
-        private void ClearError()
+        /// <summary>
+        /// Clear ALL InfoBar in UI.
+        /// </summary>
+        private void ClearInfoMessage()
         {
             AlertPanel.Children.Clear();
         }
 
-        private void AutomaticallyCloseAlerte(InfoBar infoBar)
+        /// <summary>
+        /// Task that automatically close InfoBar after a certain time.
+        /// </summary>
+        /// <param name="infoBar">The InfoBar to close.</param>
+        /// <param name="progressBar">The ProgressBar to update.</param>
+        private void AutomaticallyCloseAlerte(InfoBar infoBar, ProgressBar progressBar)
         {
             Task.Run(() =>
             {
-                Thread.Sleep(5000);
-                infoBar.IsOpen= false;
-                AlertPanel.Children.Remove(infoBar);
+                // Determine cooldown before infobar disappear.
+                int countMax = 0;
+                InfoBarSeverity severity = InfoBarSeverity.Informational;
+                // update progressbar values thread safely
+                if (this.DispatcherQueue.HasThreadAccess)
+                {
+                    severity = infoBar.Severity;
+                }
+                else
+                {
+                    this.DispatcherQueue.TryEnqueue(
+                        Microsoft.UI.Dispatching.DispatcherQueuePriority.Normal,
+                        () =>
+                        {
+                            severity = infoBar.Severity;
+                        });
+                }
+
+                switch (severity)
+                {
+                    case InfoBarSeverity.Success:
+                        {
+                            countMax = 2;
+                            break;
+                        }
+                    case InfoBarSeverity.Informational:
+                        {
+                            countMax = 5;
+                            break;
+                        }
+                    case InfoBarSeverity.Warning:
+                        {
+                            countMax = 10;
+                            break;
+                        }
+                    case InfoBarSeverity.Error:
+                        {
+                            countMax = 15;
+                            break;
+                        }
+                }
+
+                // Converting second to millisecond
+                countMax = countMax * 1000;
+                int actualValue = 0;
+
+                // update progressbar values thread safely
+                if (this.DispatcherQueue.HasThreadAccess)
+                {
+                    progressBar.Maximum = countMax;
+                    progressBar.Minimum = 0;
+                    progressBar.Value = actualValue;
+                }
+                else
+                {
+                    this.DispatcherQueue.TryEnqueue(
+                        Microsoft.UI.Dispatching.DispatcherQueuePriority.Normal,
+                        () =>
+                        {
+                            progressBar.Maximum = countMax;
+                            progressBar.Minimum = 0;
+                            progressBar.Value = actualValue;
+                        });
+                }
+
+                while (actualValue < countMax)
+                {
+                    // update progressbar value thread safely
+                    if (this.DispatcherQueue.HasThreadAccess)
+                    {
+                        progressBar.Value = actualValue;
+                    }
+                    else
+                    {
+                        this.DispatcherQueue.TryEnqueue(
+                            Microsoft.UI.Dispatching.DispatcherQueuePriority.Normal,
+                            () =>
+                            {
+                                progressBar.Value = actualValue;
+                            });
+                    }
+
+                    Thread.Sleep(100);
+                    actualValue += 100;
+                }
+                if (this.DispatcherQueue.HasThreadAccess)
+                {
+                    infoBar.IsOpen = false;
+                    AlertPanel.Children.Remove(infoBar);
+                }
+                else
+                {
+                    this.DispatcherQueue.TryEnqueue(
+                        Microsoft.UI.Dispatching.DispatcherQueuePriority.Normal,
+                        () =>
+                        {
+                            infoBar.IsOpen = false;
+                            AlertPanel.Children.Remove(infoBar);
+                        });
+                }
             });
         }
 

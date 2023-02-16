@@ -18,8 +18,8 @@
             <TreeViewItem
                 AutomationProperties.Name="{x:Bind Name}"
                 ItemsSource="{x:Bind Children}"
-                IsExpanded="{x:Bind IsExpanded,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                IsSelected="{x:Bind IsSelected,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                IsExpanded="{x:Bind IsExpanded,Mode=TwoWay}"
+                IsSelected="{x:Bind IsSelected,Mode=TwoWay}">
                 <StackPanel
                     Orientation="Horizontal">
                     <Image
@@ -36,8 +36,8 @@
             x:DataType="local:ExplorerItem">
             <TreeViewItem
                 AutomationProperties.Name="{x:Bind Name}"
-                IsExpanded="{x:Bind IsExpanded,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                IsSelected="{x:Bind IsSelected,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                IsExpanded="{x:Bind IsExpanded,Mode=TwoWay}"
+                IsSelected="{x:Bind IsSelected,Mode=TwoWay}">
                 <StackPanel
                     Orientation="Horizontal">
                     <Image
@@ -54,8 +54,8 @@
             x:DataType="local:ExplorerItem">
             <TreeViewItem
                 AutomationProperties.Name="{x:Bind Name}"
-                IsExpanded="{x:Bind IsExpanded,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                IsSelected="{x:Bind IsSelected,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                IsExpanded="{x:Bind IsExpanded,Mode=TwoWay}"
+                IsSelected="{x:Bind IsSelected,Mode=TwoWay}">
                 <StackPanel
                     Orientation="Horizontal">
                     <Image
@@ -72,8 +72,8 @@
             x:DataType="local:ExplorerItem">
             <TreeViewItem
                 AutomationProperties.Name="{x:Bind Name}"
-                IsExpanded="{x:Bind IsExpanded,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                IsSelected="{x:Bind IsSelected,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                IsExpanded="{x:Bind IsExpanded,Mode=TwoWay}"
+                IsSelected="{x:Bind IsSelected,Mode=TwoWay}">
                 <StackPanel
                     Orientation="Horizontal">
                     <Image
@@ -131,7 +131,6 @@
             UnknowFileTemplate="{StaticResource UnknowFileTemplate}" />
     </Page.Resources>
 
-
     <Grid
         RowSpacing="15"
         Margin="0,25,0,15">
@@ -153,14 +152,26 @@
             <RowDefinition
                 Height="auto" />
         </Grid.RowDefinitions>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition
+                Width="*" />
+            <ColumnDefinition
+                Width="auto" />
+        </Grid.ColumnDefinitions>
         
         <!--#region Alertes-->
 
-        <StackPanel
-            x:Name="AlertPanel"
-            Grid.ColumnSpan="10"
+        <ScrollViewer
+            Grid.Column="1"
+            Grid.Row="0"
             Grid.RowSpan="10"
-            Margin="10" />
+            MaxWidth="350">
+            <StackPanel
+                x:Name="AlertPanel"
+                HorizontalAlignment="Right"/>
+        </ScrollViewer>
+        
 
         <!--#endregion-->
 
