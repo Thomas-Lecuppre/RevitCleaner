@@ -299,7 +299,7 @@ namespace RevitCleaner
             ViewModel.ExplorerItems.Add(mainDir);
 
             // Pour chaque dossier du dossier on l'affiche dans l'arbre de la page principale.
-            foreach (ExplorerItem item in FilesInFolder(folderPath, true))
+            foreach (ExplorerItem item in FilesInFolder(folderPath, false))
             {
                 mainDir.Children.Add(item);
             }
@@ -349,7 +349,7 @@ namespace RevitCleaner
             // so we don't need to show this.
             foreach (string dir in subDirs)
             {
-                ObservableCollection<ExplorerItem> dirFiles = FilesInFolder(dir, true);
+                ObservableCollection<ExplorerItem> dirFiles = FilesInFolder(dir, false);
 
                 // Directory and subdirectoies contain at least 1 save file so we add the folder.
                 if (dirFiles != null && dirFiles.Count > 0)
@@ -358,7 +358,6 @@ namespace RevitCleaner
                     {
                         Name = new DirectoryInfo(dir).Name,
                         Path = dir,
-                        IsSelected = true,
                         IsExpanded = isExpanded,
                         Type = ExplorerItem.ExplorerItemType.Folder
                     };
@@ -382,8 +381,6 @@ namespace RevitCleaner
                 {
                     Name = fi.Name.Replace(fi.Extension, ""),
                     Path = fi.FullName,
-                    IsSelected = true,
-                    IsExpanded = isExpanded
                 };
                 item.Type = GetUIFileType(fi);
 
