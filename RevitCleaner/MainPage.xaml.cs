@@ -24,6 +24,7 @@ using WinRT.Interop;
 using System.Threading;
 using System.Reflection.Metadata.Ecma335;
 using Windows.Media.Core;
+using System.Diagnostics;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -113,10 +114,16 @@ namespace RevitCleaner
             }
         }
 
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            Button b = (Button)sender;
+            Process.Start("explorer.exe", Path.GetDirectoryName(b.Tag.ToString()));
+        }
+
         public void CountSelected()
         {
-            int count = FilesTreeView.SelectedItems.Count;
-            AddInfoMessage("Debug", count.ToString(), InfoBarSeverity.Informational);
+            int count = FilesListView.SelectedItems.Count;
+            AddInfoMessage("Debug", count.ToString(), InfoBarSeverity.Informational, 2);
         }
 
         #region Files Analysis
@@ -286,23 +293,7 @@ namespace RevitCleaner
             // Clearing existing UI items.
             ViewModel.ExplorerItems.Clear();
 
-            // Add main directory as root folder in treeview.
-            ExplorerItem mainDir = new ExplorerItem()
-            {
-                Name = new DirectoryInfo(folderPath).Name,
-                Path = folderPath,
-                IsExpanded = true,
-                IsSelected = true,
-                Type = ExplorerItem.ExplorerItemType.Folder
-            };
-
-            ViewModel.ExplorerItems.Add(mainDir);
-
-            // Pour chaque dossier du dossier on l'affiche dans l'arbre de la page principale.
-            foreach (ExplorerItem item in FilesInFolder(folderPath, false))
-            {
-                mainDir.Children.Add(item);
-            }
+            FilesInFolder(folderPath);
 
             CountSelected();
         }
@@ -315,10 +306,45 @@ namespace RevitCleaner
         /// <param name="caseSensitive">La recherche est-elle sensible à la casse ?</param>
         /// <param name="isExpanded">Le noeud doit-il être étendu ?</param>
         /// <returns>Une liste de noeuds.</returns>
-        private ObservableCollection<ExplorerItem> FilesInFolder(string folderPath, bool isExpanded)
+        private void FilesInFolder(string folderPath)
         {
+            FileInfo[] dirFiles = new FileInfo[] { };
+
+            // Trying to get file in folder.
+            // This was done like this because on the author pc, a direcotry was found whereas it doesn't exist on the pc.
+            // If that occure again, application won't crash.
+            try
+            {
+                dirFiles = new DirectoryInfo(folderPath).GetFiles();
+            }
+            catch (DirectoryNotFoundException dnfex)
+            {
+                AddInfoMessage("Directory Not Found Exception", dnfex.Message, InfoBarSeverity.Warning, 10);
+                return;
+            }
+            catch (Exception ex)
+            {
+                AddInfoMessage("Exception", ex.Message, InfoBarSeverity.Error, 15);
+                return;
+            }
+
+            // Get Files in current folder.
+            List<FileInfo> curDirFiles = GetFiles(folderPath, false);
+            // Add them in UI
+            foreach (FileInfo fi in curDirFiles)
+            {
+                ExplorerItem item = new ExplorerItem()
+                {
+                    Name = fi.Name.Replace(fi.Extension, ""),
+                    Path = fi.FullName,
+                    IsSelected = true,
+                };
+                item.Type = GetUIFileType(fi);
+
+                ViewModel.ExplorerItems.Add(item);
+            }
+
             // Initializing list
-            ObservableCollection<ExplorerItem> list = new ObservableCollection<ExplorerItem>();
             string[] subDirs = new string[] { };
 
             // Trying to get sub directory.
@@ -330,64 +356,25 @@ namespace RevitCleaner
             }
             catch (DirectoryNotFoundException dnfex)
             {
-                AddInfoMessage("Directory Not Found Exception", dnfex.Message, InfoBarSeverity.Warning);
+                AddInfoMessage("Directory Not Found Exception", dnfex.Message, InfoBarSeverity.Warning, 10);
+                return;
             }
             catch (IOException ioex)
             {
-                AddInfoMessage("IO Exception", ioex.Message, InfoBarSeverity.Error);
-                return list;
+                AddInfoMessage("IO Exception", ioex.Message, InfoBarSeverity.Error, 15);
+                return;
             }
             catch (Exception ex)
             {
-                AddInfoMessage("Exception", ex.Message, InfoBarSeverity.Error);
-                return list;
+                AddInfoMessage("Exception", ex.Message, InfoBarSeverity.Error, 15);
+                return;
             }
-            finally { }
 
-            // Add folder to treeview if it contain children.
-            // Because this method turn in a loop from top directory to the farest one, if there is no child there is no file
-            // so we don't need to show this.
-            foreach (string dir in subDirs)
+            // If sub folder can be accessed then try to retrieve them files
+            foreach(string dirPath in subDirs)
             {
-                ObservableCollection<ExplorerItem> dirFiles = FilesInFolder(dir, false);
-
-                // Directory and subdirectoies contain at least 1 save file so we add the folder.
-                if (dirFiles != null && dirFiles.Count > 0)
-                {
-                    ExplorerItem d = new ExplorerItem()
-                    {
-                        Name = new DirectoryInfo(dir).Name,
-                        Path = dir,
-                        IsExpanded = isExpanded,
-                        Type = ExplorerItem.ExplorerItemType.Folder
-                    };
-
-                    // Repeating the process.
-                    foreach (ExplorerItem item in dirFiles)
-                    {
-                        d.Children.Add(item);
-                    }
-
-                    list.Add(d);
-                }
+                FilesInFolder(dirPath);
             }
-
-            // Get Files in current root folder.
-            List<FileInfo> curDirFiles = GetFiles(folderPath, false);
-            // Add them in UI
-            foreach (FileInfo fi in curDirFiles)
-            {
-                ExplorerItem item = new ExplorerItem()
-                {
-                    Name = fi.Name.Replace(fi.Extension, ""),
-                    Path = fi.FullName,
-                };
-                item.Type = GetUIFileType(fi);
-
-                list.Add(item);
-            }
-
-            return list;
         }
 
         /// <summary>
@@ -429,7 +416,7 @@ namespace RevitCleaner
         /// <param name="title">Title of message.</param>
         /// <param name="message">Message.</param>
         /// <param name="infoBarSeverity">The severity level.</param>
-        private void AddInfoMessage(string title, string message, InfoBarSeverity infoBarSeverity)
+        private void AddInfoMessage(string title, string message, InfoBarSeverity infoBarSeverity, int maxSecond)
         {
             InfoBar ib = new InfoBar()
             {
@@ -442,7 +429,7 @@ namespace RevitCleaner
 
             ib.Content = pb;
             AlertPanel.Children.Add(ib);
-            AutomaticallyCloseAlerte(ib, pb);
+            AutomaticallyCloseAlerte(ib, pb, maxSecond);
         }
 
         /// <summary>
@@ -458,66 +445,16 @@ namespace RevitCleaner
         /// </summary>
         /// <param name="infoBar">The InfoBar to close.</param>
         /// <param name="progressBar">The ProgressBar to update.</param>
-        private void AutomaticallyCloseAlerte(InfoBar infoBar, ProgressBar progressBar)
+        private void AutomaticallyCloseAlerte(InfoBar infoBar, ProgressBar progressBar, int maxSecond)
         {
             Task.Run(() =>
             {
-                // Determine cooldown before infobar disappear.
-                int countMax = 0;
-                InfoBarSeverity severity = InfoBarSeverity.Informational;
-                // update progressbar values thread safely
-                if (this.DispatcherQueue.HasThreadAccess)
-                {
-                    severity = infoBar.Severity;
-                }
-                else
-                {
-                    this.DispatcherQueue.TryEnqueue(
-                        Microsoft.UI.Dispatching.DispatcherQueuePriority.Normal,
-                        () =>
-                        {
-                            severity = infoBar.Severity;
-                        });
-                }
-
-                switch (severity)
-                {
-                    case InfoBarSeverity.Success:
-                        {
-                            countMax = 2;
-                            break;
-                        }
-                    case InfoBarSeverity.Informational:
-                        {
-                            countMax = 5;
-                            break;
-                        }
-                    case InfoBarSeverity.Warning:
-                        {
-                            countMax = 10;
-                            break;
-                        }
-                    case InfoBarSeverity.Error:
-                        {
-                            countMax = 15;
-                            break;
-                        }
-                }
-
                 // Converting second to millisecond
-                countMax = countMax * 1000;
+                int countMax = maxSecond * 1000;
                 int actualValue = 0;
 
                 // update progressbar values thread safely
-                if (this.DispatcherQueue.HasThreadAccess)
-                {
-                    progressBar.Maximum = countMax;
-                    progressBar.Minimum = 0;
-                    progressBar.Value = actualValue;
-                }
-                else
-                {
-                    this.DispatcherQueue.TryEnqueue(
+                this.DispatcherQueue.TryEnqueue(
                         Microsoft.UI.Dispatching.DispatcherQueuePriority.Normal,
                         () =>
                         {
@@ -525,43 +462,23 @@ namespace RevitCleaner
                             progressBar.Minimum = 0;
                             progressBar.Value = actualValue;
                         });
-                }
 
                 while (actualValue < countMax)
                 {
                     // update progressbar value thread safely
-                    if (this.DispatcherQueue.HasThreadAccess)
-                    {
-                        progressBar.Value = actualValue;
-                    }
-                    else
-                    {
-                        this.DispatcherQueue.TryEnqueue(
-                            Microsoft.UI.Dispatching.DispatcherQueuePriority.Normal,
-                            () =>
-                            {
-                                progressBar.Value = actualValue;
-                            });
-                    }
+                    this.DispatcherQueue.TryEnqueue(Microsoft.UI.Dispatching.DispatcherQueuePriority.Normal, () => { progressBar.Value = actualValue; });
 
                     Thread.Sleep(100);
                     actualValue += 100;
                 }
-                if (this.DispatcherQueue.HasThreadAccess)
-                {
-                    infoBar.IsOpen = false;
-                    AlertPanel.Children.Remove(infoBar);
-                }
-                else
-                {
-                    this.DispatcherQueue.TryEnqueue(
+
+                this.DispatcherQueue.TryEnqueue(
                         Microsoft.UI.Dispatching.DispatcherQueuePriority.Normal,
                         () =>
                         {
                             infoBar.IsOpen = false;
                             AlertPanel.Children.Remove(infoBar);
                         });
-                }
             });
         }
 
@@ -574,49 +491,22 @@ namespace RevitCleaner
         /// <param name="gCount"></param>
         private void DeleteSelectedFiles()
         {
-            foreach (ExplorerItem child in ViewModel.ExplorerItems)
+            List<ExplorerItem> selectedFiles = ViewModel.ExplorerItems.Where(x => x.IsSelected).ToList();
+
+            foreach (ExplorerItem child in selectedFiles)
             {
-                if (child.Type == ExplorerItem.ExplorerItemType.Folder)
+                try
                 {
-                    DeleteSelectedFiles(child);
+                    File.Delete(child.Path);
                 }
-                else
+                catch (Exception ex) 
                 {
-                    if (child.IsSelected && File.Exists(child.Path))
-                    {
-                        try
-                        {
-                            File.Delete(child.Path);
-                        }
-                        catch { }
-                    }
+                    AddInfoMessage("Erreur suppression fichier", ex.Message, InfoBarSeverity.Warning, 10);
                 }
             }
 
             UpDateFilterData();
             ParseFilesToUI(DirectoryTextBox.Text);
-        }
-
-        private void DeleteSelectedFiles(ExplorerItem item)
-        {
-            foreach (ExplorerItem child in item.Children)
-            {
-                if (child.Type == ExplorerItem.ExplorerItemType.Folder)
-                {
-                    DeleteSelectedFiles(child);
-                }
-                else
-                {
-                    if(child.IsSelected && File.Exists(child.Path))
-                    {
-                        try
-                        {
-                            File.Delete(child.Path);
-                        }
-                        catch { }
-                    }
-                }
-            }
         }
     }
 }

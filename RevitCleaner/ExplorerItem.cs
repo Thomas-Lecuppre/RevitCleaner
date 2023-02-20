@@ -11,37 +11,6 @@ namespace RevitCleaner
         public string Path { get; set; }
         public ExplorerItemType Type { get; set; }
 
-        private ObservableCollection<ExplorerItem> m_children;
-        public ObservableCollection<ExplorerItem> Children
-        {
-            get
-            {
-                if (m_children == null)
-                {
-                    m_children = new ObservableCollection<ExplorerItem>();
-                }
-                return m_children;
-            }
-            set
-            {
-                m_children = value;
-            }
-        }
-
-        private bool m_isExpanded;
-        public bool IsExpanded
-        {
-            get { return m_isExpanded; }
-            set
-            {
-                if (m_isExpanded != value)
-                {
-                    m_isExpanded = value;
-                    NotifyPropertyChanged("IsExpanded");
-                }
-            }
-        }
-
         private bool m_isSelected;
         public bool IsSelected
         {
