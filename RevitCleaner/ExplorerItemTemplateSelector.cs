@@ -10,7 +10,6 @@ namespace RevitCleaner
 {
     class ExplorerItemTemplateSelector : DataTemplateSelector
     {
-        public DataTemplate FolderTemplate { get; set; }
         public DataTemplate RFAFileTemplate { get; set; }
         public DataTemplate RFTFileTemplate { get; set; }
         public DataTemplate RTEFileTemplate { get; set; }
@@ -19,9 +18,7 @@ namespace RevitCleaner
 
         protected override DataTemplate SelectTemplateCore(object item)
         {
-            var explorerItem = (ExplorerItem)item;
-            if (explorerItem.Type == ExplorerItem.ExplorerItemType.Folder) 
-                return FolderTemplate;
+            var explorerItem = (ExplorerItem)item;  
             if (explorerItem.Type == ExplorerItem.ExplorerItemType.RFAFile)
                 return RFAFileTemplate;
             if (explorerItem.Type == ExplorerItem.ExplorerItemType.RFTFile)
