@@ -315,7 +315,7 @@
     </Page.Resources>
 
     <Grid
-        RowSpacing="15"
+        RowSpacing="10"
         Margin="0,25,0,15">
 
         <Grid.RowDefinitions>
@@ -328,6 +328,7 @@
             <!--Option du filtre-->
             <RowDefinition
                 Height="auto" />
+            <!--Liste-->
             <RowDefinition
                 Height="*" />
             <RowDefinition
@@ -390,6 +391,7 @@
                 Grid.Column="1"
                 HorizontalAlignment="Stretch"
                 VerticalAlignment="Bottom"
+                Style="{StaticResource AccentButtonStyle}"
                 ClickMode="Release"
                 Click="SearchButton_Click"
                 ToolTipService.ToolTip="Ouvrir un explorateur de dossier.">
@@ -403,22 +405,18 @@
 
         <!--#region Ligne de recherche-->
 
-        <TextBox
-            x:Name="SearchTextBox"
-            Grid.Row="1"
-            Margin="10,0"
-            Header="Filtre de recherche :"
-            PlaceholderText="Project, Modèle générique, @Etudes"
-            ToolTipService.ToolTip="Utilisez '@' pour filtrer sur un nom de dossier. Utilisez ',' pour séparer vos recherches."
-            TextChanged="SearchTextBox_TextChanged" />
-
-
         <StackPanel
-            Grid.Row="2"
-            Margin="10,0"
+            Grid.Row="1"
+            Margin="30,0"
             Orientation="Vertical"
-            Spacing="10"
             HorizontalAlignment="Stretch">
+
+            <TextBox
+                x:Name="SearchTextBox"
+                Header="Filtre de recherche :"
+                PlaceholderText="Project, Modèle générique, @Etudes"
+                ToolTipService.ToolTip="Utilisez '@' pour filtrer sur un nom de dossier. Utilisez ',' pour séparer vos recherches."
+                TextChanged="SearchTextBox_TextChanged" />
 
             <ToggleSwitch
                 x:Name="CaseSensitiveToggleSwitch"
@@ -430,26 +428,60 @@
 
         <!--#endregion-->
 
+
         <ListView
             x:Name="FilesListView"
             Grid.Row="3"
+            Margin="30,0"
+            SelectionMode="Extended"
             ItemTemplateSelector="{StaticResource ExplorerItemTemplateSelector}"
             ItemsSource="{Binding ExplorerItems, Mode=TwoWay, UpdateSourceTrigger =PropertyChanged }"
             HorizontalAlignment="Stretch"
-            VerticalAlignment="Top"
-            />
+            VerticalAlignment="Top" />
+
+        <!--#region Gestion de la sélection-->
+
+        <StackPanel Grid.Row="2"
+                    Margin="30,0"
+                    Orientation="Horizontal"
+                    Spacing="10"
+                    HorizontalAlignment="Stretch">
+            
+            <Button
+                x:Name="SelectAll"
+                Content="Tous cocher"
+                Click="SelectAll_Click" />
+            
+            <Button
+                x:Name="UnselectAll"
+                Content="Tous décocher"
+                Click="UnselectAll_Click" />
+
+            <Button
+                x:Name="InvertAll"
+                Content="Tous inverser"
+                Click="InvertAll_Click" />
+
+            <Button
+                x:Name="InvertSelection"
+                Content="Inverser la selection"
+                Click="InvertSelection_Click" />
+
+        </StackPanel>
+        
+        <!--#endregion-->
 
         <TextBlock
             x:Name="SelectionInformationBlock"
             Grid.Row="4"
-            HorizontalAlignment="Left"
+            HorizontalAlignment="Center"
             Text="0 élément selectionné." />
 
         <Button
             x:Name="DeleteFilesButton"
             Grid.Row="5"
             HorizontalAlignment="Center"
-            Background="{ThemeResource SystemAccentColorDark1}"
+            Style="{StaticResource AccentButtonStyle}"
             Content="Nettoyer mes fichiers"
             ClickMode="Release"
             Click="DeleteFilesButton_Click"
