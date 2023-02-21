@@ -508,5 +508,25 @@ namespace RevitCleaner
             UpDateFilterData();
             ParseFilesToUI(DirectoryTextBox.Text);
         }
+
+        private void SelectAll_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void UnselectAll_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void InvertAll_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void InvertSelection_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }
