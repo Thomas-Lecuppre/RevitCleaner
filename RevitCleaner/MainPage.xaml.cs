@@ -53,7 +53,11 @@ namespace RevitCleaner
             DirectoryFilter = new List<string>();
             FileFilter = new List<string>();
 
-            CaseSensitiveToggleSwitch.IsOn = true;
+            CaseSensitiveToggleSwitch.IsOn = false;
+
+            // Deactivate not implemented functionnality
+            InvertSelection.IsEnabled= false;
+
             UpDateFilterData();
         }
 
