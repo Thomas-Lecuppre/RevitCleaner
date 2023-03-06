@@ -15,6 +15,7 @@ namespace RevitCleaner
         public MainPageViewModel()
         {
             ExplorerItems = new ObservableCollection<ExplorerItem>();
+            ShowedExplorerItems= new ObservableCollection<ExplorerItem>();
         }
 
         private ObservableCollection<ExplorerItem>  explorerItems;
@@ -25,9 +26,35 @@ namespace RevitCleaner
             set 
             { 
                 explorerItems = value;
-                NotifyPropertyChanged("ExplorerItems");
+                NotifyPropertyChanged(nameof(ExplorerItems));
             }
         }
+
+        private ObservableCollection<ExplorerItem> showedExplorerItems;
+
+        public ObservableCollection<ExplorerItem> ShowedExplorerItems
+        {
+            get { return showedExplorerItems; }
+            set 
+            { 
+                showedExplorerItems = value; 
+                NotifyPropertyChanged(nameof(ShowedExplorerItems));
+            }
+        }
+
+        private string searchToolTip;
+
+        public string SearchToolTip
+        {
+            get { return searchToolTip; }
+            set 
+            { 
+                searchToolTip = value; 
+                NotifyPropertyChanged(nameof(SearchToolTip));
+            }
+        }
+
+
 
         private void NotifyPropertyChanged(string propertyName)
         {

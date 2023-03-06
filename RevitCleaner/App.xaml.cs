@@ -55,7 +55,7 @@ namespace RevitCleaner
             var windowId = Microsoft.UI.Win32Interop.GetWindowIdFromWindow(hWnd);
             var appWindow = Microsoft.UI.Windowing.AppWindow.GetFromWindowId(windowId);
 
-            appWindow.Resize(new Windows.Graphics.SizeInt32 { Width = 800, Height = 900 });
+            appWindow.Resize(new Windows.Graphics.SizeInt32 { Width = 700, Height = 850 });
 
         }
 

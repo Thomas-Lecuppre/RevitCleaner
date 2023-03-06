@@ -315,7 +315,7 @@
     </Page.Resources>
 
     <Grid
-        RowSpacing="10"
+        RowSpacing="5"
         Margin="0,25,0,15">
 
         <Grid.RowDefinitions>
@@ -415,8 +415,9 @@
                 x:Name="SearchTextBox"
                 Header="Filtre de recherche :"
                 PlaceholderText="Project, Modèle générique, @Etudes"
-                ToolTipService.ToolTip="Utilisez '@' pour filtrer sur un nom de dossier. Utilisez ',' pour séparer vos recherches."
-                TextChanged="SearchTextBox_TextChanged" />
+                ToolTipService.ToolTip="{Binding SearchToolTip}"
+                TextChanged="SearchTextBox_TextChanged" 
+                KeyDown="SearchTextBox_KeyDown"/>
 
             <ToggleSwitch
                 x:Name="CaseSensitiveToggleSwitch"
@@ -442,30 +443,73 @@
         <!--#region Gestion de la sélection-->
 
         <StackPanel Grid.Row="2"
+                    Orientation="Vertical"
                     Margin="30,0"
-                    Orientation="Horizontal"
-                    Spacing="10"
                     HorizontalAlignment="Stretch">
-            
-            <Button
-                x:Name="SelectAll"
-                Content="Tous cocher"
-                Click="SelectAll_Click" />
-            
-            <Button
-                x:Name="UnselectAll"
-                Content="Tous décocher"
-                Click="UnselectAll_Click" />
 
-            <Button
-                x:Name="InvertAll"
-                Content="Tous inverser"
-                Click="InvertAll_Click" />
+            <StackPanel
+                Grid.Row="2"
+                Orientation="Horizontal"
+                Spacing="5"
+                HorizontalAlignment="Stretch">
 
-            <Button
-                x:Name="InvertSelection"
-                Content="Inverser la selection"
-                Click="InvertSelection_Click" />
+                <TextBlock
+                    Text="Actions globales :" />
+
+                <Button
+                    x:Name="SelectAll"
+                    Content="Tous cocher"
+                    Padding="3"
+                    ToolTipService.ToolTip="Selectionne tous les éléments sans tenir compte du filtre."
+                    Click="SelectAll_Click" />
+
+                <Button
+                    x:Name="UnselectAll"
+                    Content="Tous décocher"
+                    Padding="3"
+                    ToolTipService.ToolTip="Désélectionne tous les éléments sans tenir compte du filtre."
+                    Click="UnselectAll_Click" />
+
+                <Button
+                    x:Name="InvertAll"
+                    Content="Tous inverser"
+                    Padding="3"
+                    ToolTipService.ToolTip="Inverse la sélection de tous les éléments sans tenir compte du filtre."
+                    Click="InvertAll_Click" />
+
+            </StackPanel>
+
+            <StackPanel
+                Grid.Row="2"
+                Orientation="Horizontal"
+                Spacing="5"
+                HorizontalAlignment="Stretch">
+
+                <TextBlock
+                    Text="Actions sur la sélection :" />
+
+                <Button
+                    x:Name="SelectSelection"
+                    Content="Selectionner la selection"
+                    Padding="3"
+                    ToolTipService.ToolTip="Sélectionne tous les éléments filtrés."
+                    Click="SelectSelection_Click" />
+
+                <Button
+                    x:Name="UnselectSelection"
+                    Content="Selectionner la selection"
+                    Padding="3"
+                    ToolTipService.ToolTip="Désélectionne tous les éléments filtrés."
+                    Click="UnselectSelection_Click" />
+
+                <Button
+                    x:Name="InvertSelection"
+                    Content="Inverser la selection"
+                    Padding="3"
+                    ToolTipService.ToolTip="Inverse la sélection de tous les éléments filtrés."
+                    Click="InvertSelection_Click" />
+
+            </StackPanel>
 
         </StackPanel>
         

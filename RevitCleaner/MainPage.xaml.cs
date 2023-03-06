@@ -25,6 +25,7 @@ using System.Threading;
 using System.Reflection.Metadata.Ecma335;
 using Windows.Media.Core;
 using System.Diagnostics;
+using Windows.System;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -39,6 +40,7 @@ namespace RevitCleaner
         public MainWindow MainWindowView { get; set; }
         public MainPageViewModel ViewModel { get; set; }
         private List<string> DirectoryFilter { get; set; }
+        public List<string> StrictDirectoryFilter { get; set; }
         private List<string> FileFilter { get; set; }
         private bool IsCaseSensitive { get; set; }
 
@@ -51,12 +53,14 @@ namespace RevitCleaner
             this.DataContext = ViewModel;
 
             DirectoryFilter = new List<string>();
+            StrictDirectoryFilter = new List<string>();
             FileFilter = new List<string>();
 
             CaseSensitiveToggleSwitch.IsOn = false;
-
-            // Deactivate not implemented functionnality
-            InvertSelection.IsEnabled= false;
+            ViewModel.SearchToolTip = "C'est dans cette zone que vous pouvez filtrer la liste des éléments trouvés." +
+                "\nSéparez tous vos composants de filtre par \",\"." +
+                "\nLa recherche ne tient plus compte des majuscules et minuscules." +
+                "\n\nPour obtenir plus d'informations sur les fonctionnalités et raccourcis possibles appuyez sur \"F1\".";
 
             UpDateFilterData();
         }
@@ -85,6 +89,17 @@ namespace RevitCleaner
 
         private void CaseSensitiveToggleSwitch_Toggled(object sender, RoutedEventArgs e)
         {
+            ViewModel.SearchToolTip = CaseSensitiveToggleSwitch.IsOn ?
+                "C'est dans cette zone que vous pouvez filtrer la liste des éléments trouvés." +
+                "\nSéparez tous vos composants de filtre par \",\"." +
+                "\nLa recherche ne tient compte des majuscules et minuscules." +
+                "\n\nPour obtenir plus d'informations sur les fonctionnalités et raccourcis possibles appuyez sur \"F1\"."
+                :
+                "C'est dans cette zone que vous pouvez filtrer la liste des éléments trouvés." +
+                "\nSéparez tous vos composants de filtre par \",\"." +
+                "\nLa recherche ne tient plus compte des majuscules et minuscules." +
+                "\n\nPour obtenir plus d'informations sur les fonctionnalités et raccourcis possibles appuyez sur \"F1\".";
+
             UpDateFilterData();
             ParseFilesToUI(DirectoryTextBox.Text);
         }
@@ -515,22 +530,59 @@ namespace RevitCleaner
 
         private void SelectAll_Click(object sender, RoutedEventArgs e)
         {
-
+            foreach(ExplorerItem item in ViewModel.ExplorerItems)
+            {
+                item.IsSelected= true;
+            }
         }
 
         private void UnselectAll_Click(object sender, RoutedEventArgs e)
         {
-
+            foreach (ExplorerItem item in ViewModel.ExplorerItems)
+            {
+                item.IsSelected = false;
+            }
         }
 
         private void InvertAll_Click(object sender, RoutedEventArgs e)
         {
+            foreach (ExplorerItem item in ViewModel.ExplorerItems)
+            {
+                item.IsSelected = !item.IsSelected;
+            }
+        }
 
+        private void SelectSelection_Click(object sender, RoutedEventArgs e)
+        {
+            foreach (ExplorerItem item in ViewModel.ShowedExplorerItems)
+            {
+                item.IsSelected = true;
+            }
+        }
+
+        private void UnselectSelection_Click(object sender, RoutedEventArgs e)
+        {
+            foreach (ExplorerItem item in ViewModel.ShowedExplorerItems)
+            {
+                item.IsSelected = false;
+            }
         }
 
         private void InvertSelection_Click(object sender, RoutedEventArgs e)
         {
+            foreach(ExplorerItem item in ViewModel.ShowedExplorerItems)
+            {
+                item.IsSelected = !item.IsSelected;
+            }
+        }
 
+        private void SearchTextBox_KeyDown(object sender, KeyRoutedEventArgs e)
+        {
+            VirtualKey key= e.Key;
+            if(key == VirtualKey.F1)
+            {
+                Process.Start(@"https://app.thomas-lecuppre.fr/application-pour-revit/revit-cleaner#filtrer-dans-revit-cleaner");
+            }
         }
     }
 }
