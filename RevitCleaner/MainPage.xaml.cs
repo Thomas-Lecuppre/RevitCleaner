@@ -26,6 +26,9 @@ using System.Reflection.Metadata.Ecma335;
 using Windows.Media.Core;
 using System.Diagnostics;
 using Windows.System;
+using static System.Net.Mime.MediaTypeNames;
+using System.Xml.Linq;
+using System.Net;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -39,10 +42,16 @@ namespace RevitCleaner
     {
         public MainWindow MainWindowView { get; set; }
         public MainPageViewModel ViewModel { get; set; }
-        private List<string> DirectoryFilter { get; set; }
-        public List<string> StrictDirectoryFilter { get; set; }
-        private List<string> FileFilter { get; set; }
+
+        // Listes of different kind of filter.
+        private List<string> ListDirectoryFilter { get; set; }
+        public List<string> ListStrictDirectoryFilter { get; set; }
+        private List<string> ListAntiDirectoryFilter { get; set; }
+        public List<string> ListAntiStrictDirectoryFilter { get; set; }
+        private List<string> ListFileFilter { get; set; }
+        private List<string> ListAntiFileFilter { get; set; }
         private bool IsCaseSensitive { get; set; }
+        private bool NeedConfirmation { get; set; }
 
         public MainPage()
         {
@@ -52,15 +61,21 @@ namespace RevitCleaner
             ViewModel= new MainPageViewModel();
             this.DataContext = ViewModel;
 
-            DirectoryFilter = new List<string>();
-            StrictDirectoryFilter = new List<string>();
-            FileFilter = new List<string>();
+            ListDirectoryFilter = new List<string>();
+            ListStrictDirectoryFilter = new List<string>();
+            ListFileFilter = new List<string>();
+
+            ListAntiDirectoryFilter = new List<string>();
+            ListAntiStrictDirectoryFilter = new List<string>();
+            ListAntiFileFilter = new List<string>();
 
             CaseSensitiveToggleSwitch.IsOn = false;
             ViewModel.SearchToolTip = "C'est dans cette zone que vous pouvez filtrer la liste des éléments trouvés." +
                 "\nSéparez tous vos composants de filtre par \",\"." +
                 "\nLa recherche ne tient plus compte des majuscules et minuscules." +
                 "\n\nPour obtenir plus d'informations sur les fonctionnalités et raccourcis possibles appuyez sur \"F1\".";
+
+            NeedConfirmation = true;
 
             UpDateFilterData();
         }
@@ -84,7 +99,7 @@ namespace RevitCleaner
         private void SearchTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             UpDateFilterData();
-            ParseFilesToUI(DirectoryTextBox.Text);
+            ShowInUI();
         }
 
         private void CaseSensitiveToggleSwitch_Toggled(object sender, RoutedEventArgs e)
@@ -101,20 +116,20 @@ namespace RevitCleaner
                 "\n\nPour obtenir plus d'informations sur les fonctionnalités et raccourcis possibles appuyez sur \"F1\".";
 
             UpDateFilterData();
-            ParseFilesToUI(DirectoryTextBox.Text);
+            ShowInUI();
         }
 
         private void DeleteFilesButton_Click(object sender, RoutedEventArgs e)
         {
-            if(DeleteFilesButton.Content.ToString() == "Nettoyer mes fichiers")
+            if(DeleteFilesButton.Content.ToString() == ViewModel.FileCounter && NeedConfirmation)
             {
-                DeleteFilesButton.Content = "Presser une seconde fois pour confirmer";
+                NeedConfirmation = false;
+                ViewModel.FileCounter = "Presser une seconde fois pour confirmer";
             }
             else
             {
-                ClearInfoMessage();
+                NeedConfirmation = true;
                 DeleteSelectedFiles();
-                DeleteFilesButton.Content = "Nettoyer mes fichiers";
             }
         }
 
@@ -125,11 +140,16 @@ namespace RevitCleaner
                 // Looking for all the files in folder.
                 UpDateFilterData();
                 ParseFilesToUI(DirectoryTextBox.Text);
+                ViewModel.EnableControls = true;
             }
             else
             {
                 // Clearing existing UI items.
                 ViewModel.ExplorerItems.Clear();
+                ViewModel.ShowedExplorerItems.Clear();
+
+                if(string.IsNullOrEmpty(DirectoryTextBox.Text)) SearchTextBox.Text = string.Empty;
+                ViewModel.EnableControls = false;
             }
         }
 
@@ -139,11 +159,6 @@ namespace RevitCleaner
             Process.Start("explorer.exe", Path.GetDirectoryName(b.Tag.ToString()));
         }
 
-        public void CountSelected()
-        {
-            int count = FilesListView.SelectedItems.Count;
-            AddInfoMessage("Debug", count.ToString(), InfoBarSeverity.Informational, 2);
-        }
 
         #region Files Analysis
 
@@ -164,7 +179,7 @@ namespace RevitCleaner
                 if (!IsRevitFile(fi.Extension)) continue;
                 if (!IsSaveFile(fi.FullName)) continue;
                 // There is no filter, simply add file to the list.
-                if (DirectoryFilter.Count <= 0 && FileFilter.Count <= 0)
+                if (ListDirectoryFilter.Count <= 0 && ListFileFilter.Count <= 0)
                 {
                     validFiles.Add(fi);
                     continue;
@@ -175,25 +190,25 @@ namespace RevitCleaner
                 fileName = IsCaseSensitive ? fileName : fileName.ToLower();
                 List<bool> filterResult = new List<bool>();
 
-                foreach(string d in DirectoryFilter)
+                foreach(string d in ListDirectoryFilter)
                 {
                     string str = IsCaseSensitive ? d : d.ToLower();
                     filterResult.Add(filePath.Contains(str));
                 }
 
                 // If all directory filter aren't correct then pass to the next file.
-                if (filterResult.Where(x => x == true).Count() != DirectoryFilter.Count) continue;
+                if (filterResult.Where(x => x == true).Count() != ListDirectoryFilter.Count) continue;
 
                 filterResult.Clear();
 
-                foreach (string d in FileFilter)
+                foreach (string d in ListFileFilter)
                 {
                     string str = IsCaseSensitive ? d : d.ToLower();
                     filterResult.Add(fileName.Contains(str));
                 }
 
                 // If all file name filter are correct then add the file to valid list.
-                if (filterResult.Where(x => x == true).Count() == FileFilter.Count) validFiles.Add(fi);
+                if (filterResult.Where(x => x == true).Count() == ListFileFilter.Count) validFiles.Add(fi);
 
             }
 
@@ -232,66 +247,132 @@ namespace RevitCleaner
         {
             IsCaseSensitive = CaseSensitiveToggleSwitch.IsOn;
             string filter = SearchTextBox.Text;
-            if (string.IsNullOrEmpty(filter))
-            {
-                DirectoryFilter.Clear();
-                FileFilter.Clear();
-            }
-            else
-            {
-                DirectoryFilter = GetFolderFilter(filter);
-                FileFilter = GetFileFilter(filter);
-            }
+
+            ListDirectoryFilter.Clear();
+            ListStrictDirectoryFilter.Clear();
+            ListFileFilter.Clear();
+            ListAntiDirectoryFilter.Clear();
+            ListAntiStrictDirectoryFilter.Clear();
+            ListAntiFileFilter.Clear();
+
+            if (string.IsNullOrEmpty(filter)) return;
+
+            GetFolderFilter(filter);
+            GetFileFilter(filter);
         }
 
-        private List<string> GetFolderFilter(string filter)
+        private void GetFolderFilter(string filter)
         {
-            List<string> folders = new List<string>();
-            if (string.IsNullOrWhiteSpace(filter)) return folders;
-            if (!filter.Contains('@')) return folders;
+            if (string.IsNullOrEmpty(filter)) return;
+            if (!(filter.Contains('@') || filter.Contains('#'))) return;
 
             if (filter.Contains(','))
             {
                 string[] component = filter.Split(',');
                 foreach (string s in component)
                 {
-                    if (s.StartsWith("@"))
+                    ClassifyFolderFilter(s);
+                }
+            }
+            else
+            {
+                ClassifyFolderFilter(filter);
+            }
+        }
+
+        private void GetFileFilter(string filter)
+        {
+            if(string.IsNullOrEmpty(filter)) return;
+
+            if (filter.Contains(','))
+            {
+                // Chop filter into list of component
+                string[] component = filter.Split(',');
+                foreach (string s in component)
+                {
+                    string txt = s.Trim();
+
+                    if (!(txt.Contains('@') || txt.Contains('#')) && !string.IsNullOrEmpty(txt))
                     {
-                        string f = s.Remove(0, 1);
-                        f = f.Trim();
-                        folders.Add(f);
+                        if (txt.StartsWith('!'))
+                        {
+                            txt = txt.Remove(0, 1);
+                            txt = txt.Trim();
+                            if (!string.IsNullOrEmpty(txt)) ListAntiFileFilter.Add(txt);
+                        }
+                        else
+                        {
+                            ListFileFilter.Add(txt);
+                        }
                     }
                 }
             }
-            else
+            else if (!(filter.Contains('@') || filter.Contains('#')))
             {
-                if (filter.StartsWith("@"))
+                string txt = filter.Trim();
+                if (txt.StartsWith('!'))
                 {
-                    string f = filter.Remove(0, 1);
-                    f = f.Trim();
-                    folders.Add(f);
+                    txt = txt.Remove(0, 1);
+                    txt = txt.Trim();
+                    if (!string.IsNullOrEmpty(txt)) ListAntiFileFilter.Add(txt);
+                }
+                else
+                {
+                    ListFileFilter.Add(txt);
                 }
             }
 
-            return folders;
         }
 
-        private List<string> GetFileFilter(string filter)
+        private void ClassifyFolderFilter(string filter)
         {
-            List<string> files = new List<string>();
+            string txt = filter.Trim();
 
-            if (filter.Contains(','))
+            // If cleared filter component start with @ it's a strict folder filter.
+            if (txt.StartsWith("@"))
             {
-                string[] component = filter.Split(',');
-                foreach (string s in component)
+                string f = txt.Remove(0, 1);
+                f = f.Trim();
+
+                if (string.IsNullOrEmpty(f)) return;
+
+                // If strict folder filter start with ! it's a reverse one.
+                if (f.StartsWith("!"))
                 {
-                    if (!s.StartsWith("@")) files.Add(s.Trim());
+                    f = f.Remove(0, 1);
+                    f = f.Trim();
+                    if (!string.IsNullOrEmpty(f)) ListAntiStrictDirectoryFilter.Add(f);
+                    return;
+                }
+                else
+                {
+                    ListStrictDirectoryFilter.Add(f);
+                    return;
                 }
             }
-            else if (!filter.StartsWith("@")) files.Add(filter.Trim());
 
+            // If cleared filter component start with # it's a folder filter.
+            if (txt.StartsWith("#"))
+            {
+                string f = txt.Remove(0, 1);
+                f = f.Trim();
 
-            return files;
+                if (string.IsNullOrEmpty(f)) return;
+
+                // If folder filter start with ! it's a reverse one.
+                if (f.StartsWith("!"))
+                {
+                    f = f.Remove(0, 1);
+                    f = f.Trim();
+                    if (!string.IsNullOrEmpty(f)) ListAntiDirectoryFilter.Add(f);
+                    return;
+                }
+                else
+                {
+                    ListDirectoryFilter.Add(f);
+                    return;
+                }
+            }
         }
 
         #endregion
@@ -311,10 +392,9 @@ namespace RevitCleaner
 
             // Clearing existing UI items.
             ViewModel.ExplorerItems.Clear();
-
+            ViewModel.ShowedExplorerItems.Clear();
             FilesInFolder(folderPath);
-
-            CountSelected();
+            ShowInUI();
         }
 
         /// <summary>
@@ -336,29 +416,25 @@ namespace RevitCleaner
             {
                 dirFiles = new DirectoryInfo(folderPath).GetFiles();
             }
-            catch (DirectoryNotFoundException dnfex)
+            catch
             {
-                AddInfoMessage("Directory Not Found Exception", dnfex.Message, InfoBarSeverity.Warning, 10);
-                return;
-            }
-            catch (Exception ex)
-            {
-                AddInfoMessage("Exception", ex.Message, InfoBarSeverity.Error, 15);
                 return;
             }
 
             // Get Files in current folder.
             List<FileInfo> curDirFiles = GetFiles(folderPath, false);
-            // Add them in UI
-            foreach (FileInfo fi in curDirFiles)
+
+            // Fill Explorer items list with files.
+            foreach(FileInfo file in curDirFiles)
             {
-                ExplorerItem item = new ExplorerItem()
+                ExplorerItem item = new ExplorerItem(this.ViewModel)
                 {
-                    Name = fi.Name.Replace(fi.Extension, ""),
-                    Path = fi.FullName,
+                    Name = file.Name.Replace(file.Extension, string.Empty),
+                    Path = file.FullName,
                     IsSelected = true,
+                    IsShowed = true
                 };
-                item.Type = GetUIFileType(fi);
+                item.Type = GetUIFileType(file);
 
                 ViewModel.ExplorerItems.Add(item);
             }
@@ -373,19 +449,8 @@ namespace RevitCleaner
             {
                 subDirs = Directory.GetDirectories(folderPath);
             }
-            catch (DirectoryNotFoundException dnfex)
+            catch
             {
-                AddInfoMessage("Directory Not Found Exception", dnfex.Message, InfoBarSeverity.Warning, 10);
-                return;
-            }
-            catch (IOException ioex)
-            {
-                AddInfoMessage("IO Exception", ioex.Message, InfoBarSeverity.Error, 15);
-                return;
-            }
-            catch (Exception ex)
-            {
-                AddInfoMessage("Exception", ex.Message, InfoBarSeverity.Error, 15);
                 return;
             }
 
@@ -394,6 +459,101 @@ namespace RevitCleaner
             {
                 FilesInFolder(dirPath);
             }
+        }
+
+        private void ShowInUI()
+        {
+            ViewModel.CountSelected();
+            // Add them in UI
+            Task.Run(() =>
+            {
+                ViewModel.ShowedExplorerItems.Clear();
+
+                // Inspect filter list before filtering
+                if (ListDirectoryFilter.Count <= 0 && ListStrictDirectoryFilter.Count <= 0 && ListFileFilter.Count <= 0 && ListAntiDirectoryFilter.Count <= 0 && ListAntiStrictDirectoryFilter.Count <= 0 && ListAntiFileFilter.Count <= 0)
+                {
+                    // Set all file as showed in UI.
+                    foreach (ExplorerItem explorerItem in ViewModel.ExplorerItems)
+                    {
+                        explorerItem.IsShowed = true;
+                        ViewModel.ShowedExplorerItems.Add(explorerItem);
+                    }
+                }
+                else
+                {
+                    foreach (ExplorerItem explorerItem in ViewModel.ExplorerItems)
+                    {
+                        explorerItem.IsShowed = IsFilterOk(explorerItem.Path);
+                    }
+
+                    List<ExplorerItem> list = ViewModel.ExplorerItems.Where(x => x.IsShowed).ToList();
+
+                    foreach (ExplorerItem item in list)
+                    {
+                        ViewModel.ShowedExplorerItems.Add(item);
+                    }
+                }
+
+                this.DispatcherQueue.TryEnqueue(
+                    Microsoft.UI.Dispatching.DispatcherQueuePriority.Normal,
+                    () =>
+                    {
+                        int fsc = ViewModel.ShowedExplorerItems.Count;
+                        int ftc = ViewModel.ExplorerItems.Count;
+                        string fs = ViewModel.ShowedExplorerItems.Count > 1 ? "s" : "";
+                        string ft = ViewModel.ExplorerItems.Count > 1 ? "s" : "";
+
+                        if (fsc <= 0)
+                        {
+                            SelectionInformationBlock.Text = $"Aucun fichier affiché / {ftc} fichier{ft}";
+                        }
+                        else
+                        {
+                            SelectionInformationBlock.Text = $"{fsc} fichier{fs} affiché{fs} / {ftc} fichier{ft}";
+                        }
+                    });
+
+            });
+        }
+
+        private bool IsFilterOk(string filepath)
+        {
+            FileInfo file = new FileInfo(filepath);
+            
+            string name = file.Name.Replace(file.Extension, string.Empty);
+            string path = Path.GetDirectoryName(file.FullName);
+            string parentFolder = file.Directory.Name;
+
+            name = IsCaseSensitive ? name : name.ToLower();
+            path = IsCaseSensitive ? path : path.ToLower();
+            parentFolder = IsCaseSensitive ? parentFolder : parentFolder.ToLower();
+
+            bool fileNameTest = false, fileNameAntiTest = false, pathTest = false, pathAntiTest = false, parentTest = false, parentAntiTest = false;
+
+            if (IsCaseSensitive)
+            {
+                fileNameTest = ListFileFilter.Where(x => name.Contains(x)).Count() == ListFileFilter.Count;
+                fileNameAntiTest = ListAntiFileFilter.Where(x => name.Contains(x)).Count() == ListAntiFileFilter.Count;
+
+                pathTest = ListDirectoryFilter.Where(x => path.Contains(x)).Count() == ListDirectoryFilter.Count;
+                pathAntiTest = ListAntiDirectoryFilter.Where(x => !path.Contains(x)).Count() == ListAntiDirectoryFilter.Count;
+
+                parentTest = ListStrictDirectoryFilter.Where(x => path.Contains(x)).Count() == ListStrictDirectoryFilter.Count;
+                parentAntiTest = ListAntiStrictDirectoryFilter.Where(x => !path.Contains(x)).Count() == ListAntiStrictDirectoryFilter.Count;
+            }
+            else
+            {
+                fileNameTest = ListFileFilter.Where(x => name.Contains(x.ToLower())).Count() == ListFileFilter.Count;
+                fileNameAntiTest = ListAntiFileFilter.Where(x => !name.Contains(x.ToLower())).Count() == ListAntiFileFilter.Count;
+
+                pathTest = ListDirectoryFilter.Where(x => path.Contains(x.ToLower())).Count() == ListDirectoryFilter.Count;
+                pathAntiTest = ListAntiDirectoryFilter.Where(x => !path.Contains(x.ToLower())).Count() == ListAntiDirectoryFilter.Count;
+
+                parentTest = ListStrictDirectoryFilter.Where(x => path.Contains(x.ToLower())).Count() == ListStrictDirectoryFilter.Count;
+                parentAntiTest = ListAntiStrictDirectoryFilter.Where(x => !path.Contains(x.ToLower())).Count() == ListAntiStrictDirectoryFilter.Count;
+            }
+
+            return fileNameTest && fileNameAntiTest && pathTest && pathAntiTest && parentTest && parentAntiTest;
         }
 
         /// <summary>
@@ -429,78 +589,6 @@ namespace RevitCleaner
             }
         }
 
-        /// <summary>
-        /// Handle the error as an InfoBar direclty in UI.
-        /// </summary>
-        /// <param name="title">Title of message.</param>
-        /// <param name="message">Message.</param>
-        /// <param name="infoBarSeverity">The severity level.</param>
-        private void AddInfoMessage(string title, string message, InfoBarSeverity infoBarSeverity, int maxSecond)
-        {
-            InfoBar ib = new InfoBar()
-            {
-                Title = title,
-                Message = message,
-                Severity = infoBarSeverity,
-                IsOpen = true
-            };
-            ProgressBar pb = new ProgressBar();
-
-            ib.Content = pb;
-            AlertPanel.Children.Add(ib);
-            AutomaticallyCloseAlerte(ib, pb, maxSecond);
-        }
-
-        /// <summary>
-        /// Clear ALL InfoBar in UI.
-        /// </summary>
-        private void ClearInfoMessage()
-        {
-            AlertPanel.Children.Clear();
-        }
-
-        /// <summary>
-        /// Task that automatically close InfoBar after a certain time.
-        /// </summary>
-        /// <param name="infoBar">The InfoBar to close.</param>
-        /// <param name="progressBar">The ProgressBar to update.</param>
-        private void AutomaticallyCloseAlerte(InfoBar infoBar, ProgressBar progressBar, int maxSecond)
-        {
-            Task.Run(() =>
-            {
-                // Converting second to millisecond
-                int countMax = maxSecond * 1000;
-                int actualValue = 0;
-
-                // update progressbar values thread safely
-                this.DispatcherQueue.TryEnqueue(
-                        Microsoft.UI.Dispatching.DispatcherQueuePriority.Normal,
-                        () =>
-                        {
-                            progressBar.Maximum = countMax;
-                            progressBar.Minimum = 0;
-                            progressBar.Value = actualValue;
-                        });
-
-                while (actualValue < countMax)
-                {
-                    // update progressbar value thread safely
-                    this.DispatcherQueue.TryEnqueue(Microsoft.UI.Dispatching.DispatcherQueuePriority.Normal, () => { progressBar.Value = actualValue; });
-
-                    Thread.Sleep(100);
-                    actualValue += 100;
-                }
-
-                this.DispatcherQueue.TryEnqueue(
-                        Microsoft.UI.Dispatching.DispatcherQueuePriority.Normal,
-                        () =>
-                        {
-                            infoBar.IsOpen = false;
-                            AlertPanel.Children.Remove(infoBar);
-                        });
-            });
-        }
-
         #endregion
 
         /// <summary>
@@ -518,14 +606,12 @@ namespace RevitCleaner
                 {
                     File.Delete(child.Path);
                 }
-                catch (Exception ex) 
+                catch
                 {
-                    AddInfoMessage("Erreur suppression fichier", ex.Message, InfoBarSeverity.Warning, 10);
                 }
             }
-
-            UpDateFilterData();
             ParseFilesToUI(DirectoryTextBox.Text);
+            ShowInUI();
         }
 
         private void SelectAll_Click(object sender, RoutedEventArgs e)

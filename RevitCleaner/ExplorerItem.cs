@@ -1,5 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Linq;
 
 namespace RevitCleaner
 {
@@ -11,25 +12,31 @@ namespace RevitCleaner
         public string Path { get; set; }
         public ExplorerItemType Type { get; set; }
 
-        private bool m_isSelected;
+        private bool isSelected;
         public bool IsSelected
         {
-            get { return m_isSelected; }
-
+            get { return isSelected; }
             set
             {
-                if (m_isSelected != value)
-                {
-                    m_isSelected = value;
-                    NotifyPropertyChanged("IsSelected");
-                }
+                isSelected = value;
+                NotifyPropertyChanged("IsSelected");
+                _mainPage.CountSelected();
             }
 
         }
+
+        public bool IsShowed { get; set; }
 
         private void NotifyPropertyChanged(string propertyName)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
+
+        public ExplorerItem(MainPageViewModel mainPage)
+        {
+            _mainPage = mainPage;
+        }
+
+        private MainPageViewModel _mainPage { get; set; }
     }
 }

@@ -36,7 +36,7 @@
                 <CheckBox
                     Grid.RowSpan="2"
                     VerticalAlignment="Center"
-                    IsChecked="{x:Bind IsSelected}" />
+                    IsChecked="{Binding IsSelected, Mode=TwoWay}" />
 
                 <Image
                     Margin="2"
@@ -49,21 +49,21 @@
                     Grid.Row="0"
                     FontSize="20"
                     FontWeight="Bold"
-                    Text="{x:Bind Name}" />
+                    Text="{Binding Name}" />
 
                 <TextBlock
                     Grid.Column="2"
                     Grid.Row="1"
                     FontSize="10"
                     Foreground="DarkGray"
-                    Text="{x:Bind Path}" />
+                    Text="{Binding Path}" />
 
                 <Button
                     Grid.Column="3"
                     Grid.RowSpan="2"
                     VerticalAlignment="Center"
                     Content="Ouvrir"
-                    Tag="{x:Bind Path}"
+                    Tag="{Binding Path}"
                     Click="Button_Click" />
                 
             </Grid>
@@ -95,7 +95,7 @@
                 <CheckBox
                     Grid.RowSpan="2"
                     VerticalAlignment="Center"
-                    IsChecked="{x:Bind IsSelected}" />
+                    IsChecked="{Binding IsSelected, Mode=TwoWay}" />
 
                 <Image
                     Margin="2"
@@ -108,21 +108,21 @@
                     Grid.Row="0"
                     FontSize="20"
                     FontWeight="Bold"
-                    Text="{x:Bind Name}" />
+                    Text="{Binding Name}" />
 
                 <TextBlock
                     Grid.Column="2"
                     Grid.Row="1"
                     FontSize="10"
                     Foreground="DarkGray"
-                    Text="{x:Bind Path}" />
+                    Text="{Binding Path}" />
 
                 <Button
                     Grid.Column="3"
                     Grid.RowSpan="2"
                     VerticalAlignment="Center"
                     Content="Ouvrir"
-                    Tag="{x:Bind Path}"
+                    Tag="{Binding Path}"
                     Click="Button_Click" />
 
             </Grid>
@@ -154,7 +154,7 @@
                 <CheckBox
                     Grid.RowSpan="2"
                     VerticalAlignment="Center"
-                    IsChecked="{x:Bind IsSelected}" />
+                    IsChecked="{Binding IsSelected, Mode=TwoWay}" />
 
                 <Image
                     Margin="2"
@@ -167,21 +167,21 @@
                     Grid.Row="0"
                     FontSize="20"
                     FontWeight="Bold"
-                    Text="{x:Bind Name}" />
+                    Text="{Binding Name}" />
 
                 <TextBlock
                     Grid.Column="2"
                     Grid.Row="1"
                     FontSize="10"
                     Foreground="DarkGray"
-                    Text="{x:Bind Path}" />
+                    Text="{Binding Path}" />
 
                 <Button
                     Grid.Column="3"
                     Grid.RowSpan="2"
                     VerticalAlignment="Center"
                     Content="Ouvrir"
-                    Tag="{x:Bind Path}"
+                    Tag="{Binding Path}"
                     Click="Button_Click" />
 
             </Grid>
@@ -213,7 +213,7 @@
                 <CheckBox
                     Grid.RowSpan="2"
                     VerticalAlignment="Center"
-                    IsChecked="{x:Bind IsSelected}" />
+                    IsChecked="{Binding IsSelected, Mode=TwoWay}" />
 
                 <Image
                     Margin="2"
@@ -226,21 +226,21 @@
                     Grid.Row="0"
                     FontSize="20"
                     FontWeight="Bold"
-                    Text="{x:Bind Name}" />
+                    Text="{Binding Name}" />
 
                 <TextBlock
                     Grid.Column="2"
                     Grid.Row="1"
                     FontSize="10"
                     Foreground="DarkGray"
-                    Text="{x:Bind Path}" />
+                    Text="{Binding Path}" />
 
                 <Button
                     Grid.Column="3"
                     Grid.RowSpan="2"
                     VerticalAlignment="Center"
                     Content="Ouvrir"
-                    Tag="{x:Bind Path}"
+                    Tag="{Binding Path}"
                     Click="Button_Click" />
 
             </Grid>
@@ -272,7 +272,7 @@
                 <CheckBox
                     Grid.RowSpan="2"
                     VerticalAlignment="Center"
-                    IsChecked="{x:Bind IsSelected}" />
+                    IsChecked="{Binding IsSelected, Mode=TwoWay}" />
 
                 <Image
                     Margin="2"
@@ -285,21 +285,21 @@
                     Grid.Row="0"
                     FontSize="20"
                     FontWeight="Bold"
-                    Text="{x:Bind Name}" />
+                    Text="{Binding Name}" />
 
                 <TextBlock
                     Grid.Column="2"
                     Grid.Row="1"
                     FontSize="10"
                     Foreground="DarkGray"
-                    Text="{x:Bind Path}" />
+                    Text="{Binding Path}" />
 
                 <Button
                     Grid.Column="3"
                     Grid.RowSpan="2"
                     VerticalAlignment="Center"
                     Content="Ouvrir"
-                    Tag="{x:Bind Path}"
+                    Tag="{Binding Path}"
                     Click="Button_Click" />
 
             </Grid>
@@ -344,7 +344,7 @@
                 Width="auto" />
         </Grid.ColumnDefinitions>
         
-        <!--#region Alertes-->
+        <!--#region Alertes
 
         <ScrollViewer
             Grid.Column="1"
@@ -357,7 +357,7 @@
         </ScrollViewer>
         
 
-        <!--#endregion-->
+        #endregion-->
 
         <!--#region Ligne saisie dossier-->
 
@@ -407,7 +407,7 @@
 
         <StackPanel
             Grid.Row="1"
-            Margin="30,0"
+            Margin="10,0"
             Orientation="Vertical"
             HorizontalAlignment="Stretch">
 
@@ -417,13 +417,15 @@
                 PlaceholderText="Project, Modèle générique, @Etudes"
                 ToolTipService.ToolTip="{Binding SearchToolTip}"
                 TextChanged="SearchTextBox_TextChanged" 
-                KeyDown="SearchTextBox_KeyDown"/>
+                KeyDown="SearchTextBox_KeyDown"
+                IsEnabled="{Binding EnableControls}"/>
 
             <ToggleSwitch
                 x:Name="CaseSensitiveToggleSwitch"
                 OnContent="Recherche stricte activée"
                 OffContent="Recherche stricte désactivée"
-                Toggled="CaseSensitiveToggleSwitch_Toggled" />
+                Toggled="CaseSensitiveToggleSwitch_Toggled"
+                IsEnabled="{Binding EnableControls}" />
 
         </StackPanel>
 
@@ -433,18 +435,17 @@
         <ListView
             x:Name="FilesListView"
             Grid.Row="3"
-            Margin="30,0"
             SelectionMode="Extended"
             ItemTemplateSelector="{StaticResource ExplorerItemTemplateSelector}"
-            ItemsSource="{Binding ExplorerItems, Mode=TwoWay, UpdateSourceTrigger =PropertyChanged }"
+            ItemsSource="{Binding ShowedExplorerItems, Mode=TwoWay, UpdateSourceTrigger =PropertyChanged }"
             HorizontalAlignment="Stretch"
             VerticalAlignment="Top" />
 
         <!--#region Gestion de la sélection-->
 
         <StackPanel Grid.Row="2"
+                    Margin="10,0"
                     Orientation="Vertical"
-                    Margin="30,0"
                     HorizontalAlignment="Stretch">
 
             <StackPanel
@@ -460,22 +461,25 @@
                     x:Name="SelectAll"
                     Content="Tous cocher"
                     Padding="3"
-                    ToolTipService.ToolTip="Selectionne tous les éléments sans tenir compte du filtre."
-                    Click="SelectAll_Click" />
+                    ToolTipService.ToolTip="Coche tous les éléments sans tenir compte du filtre."
+                    Click="SelectAll_Click"
+                    IsEnabled="{Binding EnableControls}" />
 
                 <Button
                     x:Name="UnselectAll"
                     Content="Tous décocher"
                     Padding="3"
-                    ToolTipService.ToolTip="Désélectionne tous les éléments sans tenir compte du filtre."
-                    Click="UnselectAll_Click" />
+                    ToolTipService.ToolTip="Décoche tous les éléments sans tenir compte du filtre."
+                    Click="UnselectAll_Click"
+                    IsEnabled="{Binding EnableControls}" />
 
                 <Button
                     x:Name="InvertAll"
                     Content="Tous inverser"
                     Padding="3"
                     ToolTipService.ToolTip="Inverse la sélection de tous les éléments sans tenir compte du filtre."
-                    Click="InvertAll_Click" />
+                    Click="InvertAll_Click"
+                    IsEnabled="{Binding EnableControls}" />
 
             </StackPanel>
 
@@ -490,24 +494,27 @@
 
                 <Button
                     x:Name="SelectSelection"
-                    Content="Selectionner la selection"
+                    Content="Cocher filtrés"
                     Padding="3"
-                    ToolTipService.ToolTip="Sélectionne tous les éléments filtrés."
-                    Click="SelectSelection_Click" />
+                    ToolTipService.ToolTip="Coche tous les éléments filtrés."
+                    Click="SelectSelection_Click"
+                    IsEnabled="{Binding EnableControls}" />
 
                 <Button
                     x:Name="UnselectSelection"
-                    Content="Selectionner la selection"
+                    Content="Décocher filtrés"
                     Padding="3"
-                    ToolTipService.ToolTip="Désélectionne tous les éléments filtrés."
-                    Click="UnselectSelection_Click" />
+                    ToolTipService.ToolTip="Décoche tous les éléments filtrés."
+                    Click="UnselectSelection_Click"
+                    IsEnabled="{Binding EnableControls}" />
 
                 <Button
                     x:Name="InvertSelection"
-                    Content="Inverser la selection"
+                    Content="Inverser filtrés"
                     Padding="3"
                     ToolTipService.ToolTip="Inverse la sélection de tous les éléments filtrés."
-                    Click="InvertSelection_Click" />
+                    Click="InvertSelection_Click"
+                    IsEnabled="{Binding EnableControls}" />
 
             </StackPanel>
 
@@ -518,17 +525,17 @@
         <TextBlock
             x:Name="SelectionInformationBlock"
             Grid.Row="4"
-            HorizontalAlignment="Center"
-            Text="0 élément selectionné." />
+            HorizontalAlignment="Center" />
 
         <Button
             x:Name="DeleteFilesButton"
             Grid.Row="5"
             HorizontalAlignment="Center"
             Style="{StaticResource AccentButtonStyle}"
-            Content="Nettoyer mes fichiers"
+            Content="{Binding FileCounter}"
             ClickMode="Release"
             Click="DeleteFilesButton_Click"
+            IsEnabled="{Binding ClearButtonState}"
             ToolTipService.ToolTip="Cette action est irréversible. Réfléchissez avant de cliquer." />
 
     </Grid>

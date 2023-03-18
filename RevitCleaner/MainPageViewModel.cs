@@ -14,8 +14,8 @@ namespace RevitCleaner
 
         public MainPageViewModel()
         {
-            ExplorerItems = new ObservableCollection<ExplorerItem>();
-            ShowedExplorerItems= new ObservableCollection<ExplorerItem>();
+            ExplorerItems = new AsyncObservableCollection<ExplorerItem>();
+            ShowedExplorerItems= new AsyncObservableCollection<ExplorerItem>();
         }
 
         private ObservableCollection<ExplorerItem>  explorerItems;
@@ -54,11 +54,66 @@ namespace RevitCleaner
             }
         }
 
+        private string fileCounter;
 
+        public string FileCounter
+        {
+            get 
+            { 
+                return fileCounter; 
+            }
+            set 
+            { 
+                fileCounter = value; 
+                NotifyPropertyChanged(nameof(FileCounter));
+            }
+        }
+
+        private bool enableControls;
+
+        public bool EnableControls
+        {
+            get { return enableControls; }
+            set 
+            { 
+                enableControls = value; 
+                NotifyPropertyChanged(nameof(EnableControls));
+            }
+        }
+
+        private bool clearButtonState;
+
+        public bool ClearButtonState
+        {
+            get { return clearButtonState; }
+            set 
+            { 
+                clearButtonState = value; 
+                NotifyPropertyChanged(nameof(ClearButtonState));
+            }
+        }
 
         private void NotifyPropertyChanged(string propertyName)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        public void CountSelected()
+        {
+            int count = ExplorerItems.Where(x => x.IsSelected).Count();
+            ClearButtonState = count > 0;
+            if (count <= 0)
+            {
+                FileCounter = $"Auncun fichier sélectionné";
+            }
+            else if (count == 1)
+            {
+                FileCounter = "Nettoyer 1 fichier ";
+            }
+            else
+            {
+                FileCounter = $"Nettoyer {count} fichiers";
+            }
         }
     }
 }
