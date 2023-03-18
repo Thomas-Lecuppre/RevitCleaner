@@ -15,16 +15,19 @@
 		<Nullable>disable</Nullable>
 		<GenerateAppInstallerFile>False</GenerateAppInstallerFile>
 		<AppxPackageSigningEnabled>True</AppxPackageSigningEnabled>
-		<PackageCertificateThumbprint>6981A0ACA6AE5F36C8A3E0F4F9573E36346DBD42</PackageCertificateThumbprint>
+		<PackageCertificateThumbprint>2E161127C2A20D2AFC0CB9E693F7ECE4D58CACBC</PackageCertificateThumbprint>
 		<AppxPackageSigningTimestampDigestAlgorithm>SHA256</AppxPackageSigningTimestampDigestAlgorithm>
-		<AppxAutoIncrementPackageRevision>True</AppxAutoIncrementPackageRevision>
+		<AppxAutoIncrementPackageRevision>False</AppxAutoIncrementPackageRevision>
 		<AppxSymbolPackageEnabled>False</AppxSymbolPackageEnabled>
 		<GenerateTestArtifacts>True</GenerateTestArtifacts>
 		<AppxBundle>Always</AppxBundle>
 		<AppInstallerUri>https://thomas-lecuppre.fr</AppInstallerUri>
 		<HoursBetweenUpdateChecks>0</HoursBetweenUpdateChecks>
 		<AppxPackageDir>C:\Users\thoma\source\repos\RevitCleaner\RevitCleaner\_Publish\</AppxPackageDir>
-		<AppxBundlePlatforms>x64</AppxBundlePlatforms>
+		<AppxBundlePlatforms>x86|x64</AppxBundlePlatforms>
+		<Title>RevitCleaner</Title>
+		<PackageProjectUrl>https://app.thomas-lecuppre.fr/application-pour-revit/revit-cleaner</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/Thomas-Lecuppre/RevitCleaner</RepositoryUrl>
 	</PropertyGroup>
 	<ItemGroup>
 	  <None Remove="MainPage.xaml" />

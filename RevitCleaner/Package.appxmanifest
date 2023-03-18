@@ -8,8 +8,8 @@
 
   <Identity
     Name="504f3908-798e-49ce-b4d6-0cac5ba97c46"
-    Publisher="CN=MeuhSly"
-    Version="3.0.2.0" />
+    Publisher="CN=ThomasLcp"
+    Version="3.0.0.0" />
 
   <Properties>
     <DisplayName>RevitCleaner</DisplayName>
