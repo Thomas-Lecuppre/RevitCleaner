@@ -372,6 +372,8 @@
                     Width="*" />
                 <ColumnDefinition
                     Width="auto" />
+                <ColumnDefinition
+                    Width="auto" />
             </Grid.ColumnDefinitions>
 
             <TextBox
@@ -381,14 +383,27 @@
                 VerticalContentAlignment="Center"
                 HorizontalAlignment="Stretch"
                 Text="{Binding SearchDirectory}"
-                Header="Dossier de recherche :"
+                Header="{}"
                 PlaceholderText="C:\..." 
                 TextChanged="DirectoryTextBox_TextChanged"
-                ToolTipService.ToolTip="Indiquez le dossier dans lequel chercher les éléments à nettoyer."/>
+                ToolTipService.ToolTip="Indiquez le dossier dans lequel chercher les éléments à nettoyer." />
+
+            <Button
+                x:Name="RefreshButton"
+                Grid.Column="1"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Bottom"
+                ClickMode="Release"
+                Click="RefreshButton_Click"
+                ToolTipService.ToolTip="Rafraichir la liste des fichiers du dossier."
+                IsEnabled="{Binding EnableControls}">
+                <SymbolIcon
+                    Symbol="Refresh" />
+            </Button>
 
             <Button
                 x:Name="SearchButton"
-                Grid.Column="1"
+                Grid.Column="2"
                 HorizontalAlignment="Stretch"
                 VerticalAlignment="Bottom"
                 Style="{StaticResource AccentButtonStyle}"
@@ -459,7 +474,7 @@
 
                 <Button
                     x:Name="SelectAll"
-                    Content="Tous cocher"
+                    Content="Tout cocher"
                     Padding="3"
                     ToolTipService.ToolTip="Coche tous les éléments sans tenir compte du filtre."
                     Click="SelectAll_Click"
@@ -467,7 +482,7 @@
 
                 <Button
                     x:Name="UnselectAll"
-                    Content="Tous décocher"
+                    Content="Tout décocher"
                     Padding="3"
                     ToolTipService.ToolTip="Décoche tous les éléments sans tenir compte du filtre."
                     Click="UnselectAll_Click"
@@ -475,7 +490,7 @@
 
                 <Button
                     x:Name="InvertAll"
-                    Content="Tous inverser"
+                    Content="Tout inverser"
                     Padding="3"
                     ToolTipService.ToolTip="Inverse la sélection de tous les éléments sans tenir compte du filtre."
                     Click="InvertAll_Click"
@@ -496,7 +511,7 @@
                     x:Name="SelectSelection"
                     Content="Cocher filtrés"
                     Padding="3"
-                    ToolTipService.ToolTip="Coche tous les éléments filtrés."
+                    ToolTipService.ToolTip="Coche tout les éléments filtrés."
                     Click="SelectSelection_Click"
                     IsEnabled="{Binding EnableControls}" />
 
@@ -504,7 +519,7 @@
                     x:Name="UnselectSelection"
                     Content="Décocher filtrés"
                     Padding="3"
-                    ToolTipService.ToolTip="Décoche tous les éléments filtrés."
+                    ToolTipService.ToolTip="Décoche tout les éléments filtrés."
                     Click="UnselectSelection_Click"
                     IsEnabled="{Binding EnableControls}" />
 
@@ -512,7 +527,7 @@
                     x:Name="InvertSelection"
                     Content="Inverser filtrés"
                     Padding="3"
-                    ToolTipService.ToolTip="Inverse la sélection de tous les éléments filtrés."
+                    ToolTipService.ToolTip="Inverse la sélection de tout les éléments filtrés."
                     Click="InvertSelection_Click"
                     IsEnabled="{Binding EnableControls}" />
 

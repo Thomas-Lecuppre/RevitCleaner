@@ -670,5 +670,16 @@ namespace RevitCleaner
                 Process.Start(@"https://app.thomas-lecuppre.fr/application-pour-revit/revit-cleaner#filtrer-dans-revit-cleaner");
             }
         }
+
+        private void RefreshButton_Click(object sender, RoutedEventArgs e)
+        {
+            if(Directory.Exists(DirectoryTextBox.Text))
+            {
+                // Looking for all the files in folder.
+                UpDateFilterData();
+                ParseFilesToUI(DirectoryTextBox.Text);
+                ViewModel.EnableControls = true;
+            }
+        }
     }
 }
