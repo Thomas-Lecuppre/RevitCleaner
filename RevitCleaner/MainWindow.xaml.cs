@@ -15,6 +15,7 @@ using System.Reflection;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading;
 using System.Threading.Tasks;
+using Windows.ApplicationModel;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.Storage.Pickers;
@@ -35,10 +36,9 @@ namespace RevitCleaner
             FilesListPage.MainWindowView = this;
 
             // Mise à jour de la barre de titre est de l'entête.
-            Assembly a = Assembly.GetExecutingAssembly();
-            FileVersionInfo fvi = FileVersionInfo.GetVersionInfo(a.Location);
+            PackageVersion pkgV = Package.Current.Id.Version;
 
-            Title = $"Revit Cleaner - v{fvi.ProductMajorPart}.{fvi.ProductMinorPart}";
+            Title = $"Revit Cleaner - v{pkgV.Major}.{pkgV.Minor}.{pkgV.Build}";
             ExtendsContentIntoTitleBar = true;
 
             SetTitleBar(TitleBar);

@@ -10,6 +10,7 @@ namespace RevitCleaner
         public enum ExplorerItemType { Folder, RFAFile, RFTFile, RTEFile, RVTFile, UnknowFile };
         public string Name { get; set; }
         public string Path { get; set; }
+        public long Size { get; set; }
         public ExplorerItemType Type { get; set; }
 
         private bool isSelected;

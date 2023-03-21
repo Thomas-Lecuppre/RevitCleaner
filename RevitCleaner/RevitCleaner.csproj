@@ -4,29 +4,34 @@
 		<TargetFramework>net6.0-windows10.0.19041.0</TargetFramework>
 		<TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
 		<RootNamespace>RevitCleaner</RootNamespace>
-		<ApplicationManifest>app.manifest</ApplicationManifest>
 		<Platforms>x86;x64;arm64</Platforms>
 		<RuntimeIdentifiers>win10-x86;win10-x64;win10-arm64</RuntimeIdentifiers>
 		<PublishProfile>win10-$(Platform).pubxml</PublishProfile>
 		<UseWinUI>true</UseWinUI>
 		<EnableMsixTooling>true</EnableMsixTooling>
 		<DefaultLanguage>fr-FR</DefaultLanguage>
-		<ApplicationIcon>RFA_Cleaner_32px.ico</ApplicationIcon>
 		<Nullable>disable</Nullable>
 		<GenerateAppInstallerFile>False</GenerateAppInstallerFile>
 		<AppxPackageSigningEnabled>True</AppxPackageSigningEnabled>
-		<PackageCertificateThumbprint>6981A0ACA6AE5F36C8A3E0F4F9573E36346DBD42</PackageCertificateThumbprint>
+		<PackageCertificateThumbprint>2E161127C2A20D2AFC0CB9E693F7ECE4D58CACBC</PackageCertificateThumbprint>
 		<AppxPackageSigningTimestampDigestAlgorithm>SHA256</AppxPackageSigningTimestampDigestAlgorithm>
-		<AppxAutoIncrementPackageRevision>True</AppxAutoIncrementPackageRevision>
+		<AppxAutoIncrementPackageRevision>False</AppxAutoIncrementPackageRevision>
 		<AppxSymbolPackageEnabled>False</AppxSymbolPackageEnabled>
 		<GenerateTestArtifacts>True</GenerateTestArtifacts>
 		<AppxBundle>Always</AppxBundle>
 		<AppInstallerUri>https://thomas-lecuppre.fr</AppInstallerUri>
 		<HoursBetweenUpdateChecks>0</HoursBetweenUpdateChecks>
 		<AppxPackageDir>C:\Users\thoma\source\repos\RevitCleaner\RevitCleaner\_Publish\</AppxPackageDir>
-		<AppxBundlePlatforms>x64</AppxBundlePlatforms>
+		<AppxBundlePlatforms>x86|x64</AppxBundlePlatforms>
+		<Title>RevitCleaner</Title>
+		<PackageProjectUrl>https://app.thomas-lecuppre.fr/application-pour-revit/revit-cleaner</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/Thomas-Lecuppre/RevitCleaner</RepositoryUrl>
+		<PackageIcon>RFA_Cleaner_128px.png</PackageIcon>
+		<ApplicationIcon>Assets\RFA_Cleaner_32px.ico</ApplicationIcon>
+		<ApplicationManifest>app.manifest</ApplicationManifest>
 	</PropertyGroup>
 	<ItemGroup>
+	  <None Remove="Assets\RFA_Cleaner_32px.ico" />
 	  <None Remove="MainPage.xaml" />
 	</ItemGroup>
 
@@ -36,10 +41,8 @@
 		<Content Include="Assets\Square150x150Logo.scale-200.png" />
 		<Content Include="Assets\Square44x44Logo.scale-200.png" />
 		<Content Include="Assets\Square44x44Logo.targetsize-24_altform-unplated.png" />
-		<Content Include="Assets\StoreLogo.png" />
 		<Content Include="Assets\Wide310x150Logo.scale-200.png" />
 		<Content Include="Assets\RFA_Cleaner_128px.png" />
-		<Content Include="RFA_Cleaner_32px.ico" />
 		<Content Include="Assets\RFA_256px.png" />
 		<Content Include="Assets\RFT_256px.png" />
 		<Content Include="Assets\RTE_256px.png" />
@@ -64,6 +67,17 @@
   -->
 	<ItemGroup Condition="'$(DisableMsixProjectCapabilityAddedByProject)'!='true' and '$(EnableMsixTooling)'=='true'">
 		<ProjectCapability Include="Msix" />
+	</ItemGroup>
+	<ItemGroup>
+	  <None Include="D:\Nextcloud\t.lecupp\Thomas Lecuppre\05_BDD_IMAGES\App RFA Cleaner\RFA_Cleaner_128px.png">
+	    <Pack>True</Pack>
+	    <PackagePath>\</PackagePath>
+	  </None>
+	</ItemGroup>
+	<ItemGroup>
+	  <Content Update="Assets\RFA_Cleaner_32px.ico">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </Content>
 	</ItemGroup>
 	<ItemGroup>
 	  <Page Update="MainPage.xaml">

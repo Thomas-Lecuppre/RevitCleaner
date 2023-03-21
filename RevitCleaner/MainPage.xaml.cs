@@ -29,6 +29,7 @@ using Windows.System;
 using static System.Net.Mime.MediaTypeNames;
 using System.Xml.Linq;
 using System.Net;
+using static RevitCleaner.ExplorerItem;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -70,6 +71,8 @@ namespace RevitCleaner
             ListAntiFileFilter = new List<string>();
 
             CaseSensitiveToggleSwitch.IsOn = false;
+            DeleteReportSwitch.IsOn = false;
+            RefreshButton.IsEnabled = false;
             ViewModel.SearchToolTip = "C'est dans cette zone que vous pouvez filtrer la liste des éléments trouvés." +
                 "\nSéparez tous vos composants de filtre par \",\"." +
                 "\nLa recherche ne tient plus compte des majuscules et minuscules." +
@@ -129,7 +132,7 @@ namespace RevitCleaner
             else
             {
                 NeedConfirmation = true;
-                DeleteSelectedFiles();
+                DeleteSelectedFiles(DeleteReportSwitch.IsOn);
             }
         }
 
@@ -140,7 +143,7 @@ namespace RevitCleaner
                 // Looking for all the files in folder.
                 UpDateFilterData();
                 ParseFilesToUI(DirectoryTextBox.Text);
-                ViewModel.EnableControls = true;
+                RefreshButton.IsEnabled = true;
             }
             else
             {
@@ -150,6 +153,7 @@ namespace RevitCleaner
 
                 if(string.IsNullOrEmpty(DirectoryTextBox.Text)) SearchTextBox.Text = string.Empty;
                 ViewModel.EnableControls = false;
+                RefreshButton.IsEnabled = false;
             }
         }
 
@@ -393,8 +397,10 @@ namespace RevitCleaner
             // Clearing existing UI items.
             ViewModel.ExplorerItems.Clear();
             ViewModel.ShowedExplorerItems.Clear();
+
             FilesInFolder(folderPath);
-            ShowInUI();
+            ViewModel.EnableControls = ViewModel.ExplorerItems.Count > 0;
+            ViewModel.CountSelected();
         }
 
         /// <summary>
@@ -427,16 +433,31 @@ namespace RevitCleaner
             // Fill Explorer items list with files.
             foreach(FileInfo file in curDirFiles)
             {
+                bool showed = true;
+                if (!(ListDirectoryFilter.Count <= 0 
+                    && ListStrictDirectoryFilter.Count <= 0 
+                    && ListFileFilter.Count <= 0 
+                    && ListAntiDirectoryFilter.Count <= 0 
+                    && ListAntiStrictDirectoryFilter.Count <= 0 
+                    && ListAntiFileFilter.Count <= 0))
+                {
+                    showed = IsFilterOk(file.FullName);
+                }
+
+                ExplorerItemType eit = GetUIFileType(file);
+
                 ExplorerItem item = new ExplorerItem(this.ViewModel)
                 {
                     Name = file.Name.Replace(file.Extension, string.Empty),
                     Path = file.FullName,
                     IsSelected = true,
-                    IsShowed = true
+                    IsShowed = showed,
+                    Type= eit,
+                    Size = file.Length / 8
                 };
-                item.Type = GetUIFileType(file);
 
                 ViewModel.ExplorerItems.Add(item);
+                if(item.IsShowed) ViewModel.ShowedExplorerItems.Add(item);
             }
 
             // Initializing list
@@ -596,8 +617,16 @@ namespace RevitCleaner
         /// et collections dans winui3.
         /// </summary>
         /// <param name="gCount"></param>
-        private void DeleteSelectedFiles()
+        private void DeleteSelectedFiles(bool report)
         {
+            string docsPath = "";
+            if (report)
+            {
+                docsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + @"\Revit Cleaner Reports";
+                if(!Directory.Exists(docsPath)) Directory.CreateDirectory(docsPath);
+            }
+
+            List<string> reportLines = new();
             List<ExplorerItem> selectedFiles = ViewModel.ExplorerItems.Where(x => x.IsSelected).ToList();
 
             foreach (ExplorerItem child in selectedFiles)
@@ -605,13 +634,27 @@ namespace RevitCleaner
                 try
                 {
                     File.Delete(child.Path);
+                    if(report) reportLines.Add($"Suppression de {child.Path}");
                 }
                 catch
                 {
+                    if (report) reportLines.Add($"Une erreur s'est produite lors de la suppression de {child.Path}");
                 }
             }
+
+            if (report)
+            {
+                try
+                {
+                    string time = DateTime.Now.ToString("yyyyMMdd-HH-mm-ss");
+                    string filePath = $"{docsPath}\\{time}_Rapport de suppression de fichiers.txt";
+                    File.WriteAllLines(filePath, reportLines.ToArray());
+                    Process.Start(docsPath);
+                }
+                catch { }
+            }
+
             ParseFilesToUI(DirectoryTextBox.Text);
-            ShowInUI();
         }
 
         private void SelectAll_Click(object sender, RoutedEventArgs e)
@@ -668,6 +711,16 @@ namespace RevitCleaner
             if(key == VirtualKey.F1)
             {
                 Process.Start(@"https://app.thomas-lecuppre.fr/application-pour-revit/revit-cleaner#filtrer-dans-revit-cleaner");
+            }
+        }
+
+        private void RefreshButton_Click(object sender, RoutedEventArgs e)
+        {
+            if(Directory.Exists(DirectoryTextBox.Text))
+            {
+                // Looking for all the files in folder.
+                UpDateFilterData();
+                ParseFilesToUI(DirectoryTextBox.Text);
             }
         }
     }

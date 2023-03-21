@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Windows.Media.Audio;
 
 namespace RevitCleaner
 {
@@ -101,6 +102,16 @@ namespace RevitCleaner
         public void CountSelected()
         {
             int count = ExplorerItems.Where(x => x.IsSelected).Count();
+            long size = 0;
+            foreach(ExplorerItem item in ExplorerItems)
+            {
+                if(item.IsSelected)
+                {
+                    count ++;
+                    size += item.Size;
+                }
+            }
+
             ClearButtonState = count > 0;
             if (count <= 0)
             {
@@ -108,11 +119,37 @@ namespace RevitCleaner
             }
             else if (count == 1)
             {
-                FileCounter = "Nettoyer 1 fichier ";
+                FileCounter = $"Nettoyer 1 fichier - {ReduceSize(size)}";
             }
             else
             {
-                FileCounter = $"Nettoyer {count} fichiers";
+                FileCounter = $"Nettoyer {count} fichiers - {ReduceSize(size)}";
+            }
+        }
+
+        private string ReduceSize(long size)
+        {
+            int step = 0;
+            long ajustedSize = size;
+
+            while(ajustedSize > 1024 && step <= 4)
+            {
+                step++;
+                ajustedSize = ajustedSize / 1024;
+            }
+
+            switch(step)
+            {
+                case 4:
+                    return $"{ajustedSize} To";
+                case 3:
+                    return $"{ajustedSize} Go";
+                case 2:
+                    return $"{ajustedSize} Mo";
+                case 1:
+                    return $"{ajustedSize} Ko";
+                default:
+                    return $"{ajustedSize} o";
             }
         }
     }
