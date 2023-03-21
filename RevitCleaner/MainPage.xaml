@@ -399,7 +399,7 @@
                 Click="RefreshButton_Click"
                 ToolTipService.ToolTip="Rafraichir la liste des fichiers du dossier.">
                 <SymbolIcon
-                    Symbol="Refresh" />
+                    Symbol="SyncFolder" />
             </Button>
 
             <Button
@@ -446,7 +446,6 @@
         </StackPanel>
 
         <!--#endregion-->
-
 
         <ListView
             x:Name="FilesListView"
