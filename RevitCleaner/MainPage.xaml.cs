@@ -71,6 +71,8 @@ namespace RevitCleaner
             ListAntiFileFilter = new List<string>();
 
             CaseSensitiveToggleSwitch.IsOn = false;
+            DeleteReportSwitch.IsOn = false;
+            RefreshButton.IsEnabled = false;
             ViewModel.SearchToolTip = "C'est dans cette zone que vous pouvez filtrer la liste des éléments trouvés." +
                 "\nSéparez tous vos composants de filtre par \",\"." +
                 "\nLa recherche ne tient plus compte des majuscules et minuscules." +
@@ -130,7 +132,7 @@ namespace RevitCleaner
             else
             {
                 NeedConfirmation = true;
-                DeleteSelectedFiles();
+                DeleteSelectedFiles(DeleteReportSwitch.IsOn);
             }
         }
 
@@ -141,6 +143,7 @@ namespace RevitCleaner
                 // Looking for all the files in folder.
                 UpDateFilterData();
                 ParseFilesToUI(DirectoryTextBox.Text);
+                RefreshButton.IsEnabled = true;
             }
             else
             {
@@ -150,6 +153,7 @@ namespace RevitCleaner
 
                 if(string.IsNullOrEmpty(DirectoryTextBox.Text)) SearchTextBox.Text = string.Empty;
                 ViewModel.EnableControls = false;
+                RefreshButton.IsEnabled = false;
             }
         }
 
@@ -612,8 +616,16 @@ namespace RevitCleaner
         /// et collections dans winui3.
         /// </summary>
         /// <param name="gCount"></param>
-        private void DeleteSelectedFiles()
+        private void DeleteSelectedFiles(bool report)
         {
+            string docsPath = "";
+            if (report)
+            {
+                docsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + @"\Revit Cleaner Reports";
+                if(!Directory.Exists(docsPath)) Directory.CreateDirectory(docsPath);
+            }
+
+            List<string> reportLines = new();
             List<ExplorerItem> selectedFiles = ViewModel.ExplorerItems.Where(x => x.IsSelected).ToList();
 
             foreach (ExplorerItem child in selectedFiles)
@@ -621,11 +633,26 @@ namespace RevitCleaner
                 try
                 {
                     File.Delete(child.Path);
+                    if(report) reportLines.Add($"Suppression de {child.Path}");
                 }
                 catch
                 {
+                    if (report) reportLines.Add($"Une erreur s'est produite lors de la suppression de {child.Path}");
                 }
             }
+
+            if (report)
+            {
+                try
+                {
+                    string time = DateTime.Now.ToString("yyyyMMdd-HH-mm-ss");
+                    string filePath = $"{docsPath}\\{time}_Rapport de suppression de fichiers.txt";
+                    File.WriteAllLines(filePath, reportLines.ToArray());
+                    Process.Start(docsPath);
+                }
+                catch { }
+            }
+
             ParseFilesToUI(DirectoryTextBox.Text);
         }
 
@@ -693,7 +720,6 @@ namespace RevitCleaner
                 // Looking for all the files in folder.
                 UpDateFilterData();
                 ParseFilesToUI(DirectoryTextBox.Text);
-                //ViewModel.EnableControls = true;
             }
         }
     }

@@ -335,6 +335,8 @@
                 Height="auto" />
             <RowDefinition
                 Height="auto" />
+            <RowDefinition
+                Height="auto" />
         </Grid.RowDefinitions>
 
         <Grid.ColumnDefinitions>
@@ -395,8 +397,7 @@
                 VerticalAlignment="Bottom"
                 ClickMode="Release"
                 Click="RefreshButton_Click"
-                ToolTipService.ToolTip="Rafraichir la liste des fichiers du dossier."
-                IsEnabled="{Binding EnableControls}">
+                ToolTipService.ToolTip="Rafraichir la liste des fichiers du dossier.">
                 <SymbolIcon
                     Symbol="Refresh" />
             </Button>
@@ -542,9 +543,18 @@
             Grid.Row="4"
             HorizontalAlignment="Center" />
 
+        <ToggleSwitch
+            x:Name="DeleteReportSwitch"
+            Grid.Row="5"
+            HorizontalAlignment="Center"
+            OnContent="Générer un rapport de suppression"
+            OffContent="Ne pas générer de rapport de suppression"
+            ToolTipService.ToolTip="Les rapports de suppresion se trouve dans ..\Mes Documents\Revit Cleaner Reports"
+            IsEnabled="{Binding EnableControls}" />
+
         <Button
             x:Name="DeleteFilesButton"
-            Grid.Row="5"
+            Grid.Row="6"
             HorizontalAlignment="Center"
             Style="{StaticResource AccentButtonStyle}"
             Content="{Binding FileCounter}"
