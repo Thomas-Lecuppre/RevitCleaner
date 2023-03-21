@@ -29,6 +29,7 @@ using Windows.System;
 using static System.Net.Mime.MediaTypeNames;
 using System.Xml.Linq;
 using System.Net;
+using static RevitCleaner.ExplorerItem;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -140,7 +141,6 @@ namespace RevitCleaner
                 // Looking for all the files in folder.
                 UpDateFilterData();
                 ParseFilesToUI(DirectoryTextBox.Text);
-                ViewModel.EnableControls = true;
             }
             else
             {
@@ -393,8 +393,10 @@ namespace RevitCleaner
             // Clearing existing UI items.
             ViewModel.ExplorerItems.Clear();
             ViewModel.ShowedExplorerItems.Clear();
+
             FilesInFolder(folderPath);
-            ShowInUI();
+            ViewModel.EnableControls = ViewModel.ExplorerItems.Count > 0;
+            ViewModel.CountSelected();
         }
 
         /// <summary>
@@ -427,16 +429,30 @@ namespace RevitCleaner
             // Fill Explorer items list with files.
             foreach(FileInfo file in curDirFiles)
             {
+                bool showed = true;
+                if (!(ListDirectoryFilter.Count <= 0 
+                    && ListStrictDirectoryFilter.Count <= 0 
+                    && ListFileFilter.Count <= 0 
+                    && ListAntiDirectoryFilter.Count <= 0 
+                    && ListAntiStrictDirectoryFilter.Count <= 0 
+                    && ListAntiFileFilter.Count <= 0))
+                {
+                    showed = IsFilterOk(file.FullName);
+                }
+
+                ExplorerItemType eit = GetUIFileType(file);
+
                 ExplorerItem item = new ExplorerItem(this.ViewModel)
                 {
                     Name = file.Name.Replace(file.Extension, string.Empty),
                     Path = file.FullName,
                     IsSelected = true,
-                    IsShowed = true
+                    IsShowed = showed,
+                    Type= eit,
                 };
-                item.Type = GetUIFileType(file);
 
                 ViewModel.ExplorerItems.Add(item);
+                if(item.IsShowed) ViewModel.ShowedExplorerItems.Add(item);
             }
 
             // Initializing list
@@ -611,7 +627,6 @@ namespace RevitCleaner
                 }
             }
             ParseFilesToUI(DirectoryTextBox.Text);
-            ShowInUI();
         }
 
         private void SelectAll_Click(object sender, RoutedEventArgs e)
@@ -678,7 +693,7 @@ namespace RevitCleaner
                 // Looking for all the files in folder.
                 UpDateFilterData();
                 ParseFilesToUI(DirectoryTextBox.Text);
-                ViewModel.EnableControls = true;
+                //ViewModel.EnableControls = true;
             }
         }
     }
