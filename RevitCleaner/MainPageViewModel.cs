@@ -112,19 +112,23 @@ namespace RevitCleaner
                 }
             }
 
-            ClearButtonState = count > 0;
-            if (count <= 0)
+            try
             {
-                FileCounter = $"Auncun fichier sélectionné";
+                ClearButtonState = count > 0;
+                if (count <= 0)
+                {
+                    FileCounter = $"Auncun fichier sélectionné";
+                }
+                else if (count == 1)
+                {
+                    FileCounter = $"Nettoyer 1 fichier - {ReduceSize(size)}";
+                }
+                else
+                {
+                    FileCounter = $"Nettoyer {count} fichiers - {ReduceSize(size)}";
+                }
             }
-            else if (count == 1)
-            {
-                FileCounter = $"Nettoyer 1 fichier - {ReduceSize(size)}";
-            }
-            else
-            {
-                FileCounter = $"Nettoyer {count} fichiers - {ReduceSize(size)}";
-            }
+            catch { }
         }
 
         private string ReduceSize(long size)
