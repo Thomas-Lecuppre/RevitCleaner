@@ -384,8 +384,7 @@
                 HorizontalTextAlignment="Left"
                 VerticalContentAlignment="Center"
                 HorizontalAlignment="Stretch"
-                Text="{Binding SearchDirectory}"
-                Header="{}"
+                Header="Dossier de recherche :"
                 PlaceholderText="C:\..." 
                 TextChanged="DirectoryTextBox_TextChanged"
                 ToolTipService.ToolTip="Indiquez le dossier dans lequel chercher les éléments à nettoyer." />
@@ -540,7 +539,7 @@
         <TextBlock
             x:Name="SelectionInformationBlock"
             Grid.Row="4"
-            HorizontalAlignment="Center" />
+            HorizontalAlignment="Center"/>
 
         <ToggleSwitch
             x:Name="DeleteReportSwitch"

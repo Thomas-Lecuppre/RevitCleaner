@@ -81,6 +81,8 @@ namespace RevitCleaner
             NeedConfirmation = true;
 
             UpDateFilterData();
+            DisplayFilteredElementsCount();
+            ViewModel.CountSelected();
         }
 
         private async void SearchButton_Click(object sender, RoutedEventArgs e)
@@ -162,7 +164,6 @@ namespace RevitCleaner
             Button b = (Button)sender;
             Process.Start("explorer.exe", Path.GetDirectoryName(b.Tag.ToString()));
         }
-
 
         #region Files Analysis
 
@@ -389,7 +390,7 @@ namespace RevitCleaner
         /// <param name="folderPath">Chemin du dossier inital.</param>
         /// <param name="filter">Filtre de recherche.</param>
         /// <param name="caseSensitive">La recherche est-elle sensible à la casse ?</param>
-        public void ParseFilesToUI(string folderPath)
+        public async void ParseFilesToUI(string folderPath)
         {
             // If directory doesn't exist then exit.
             if (!Directory.Exists(folderPath)) return;
@@ -398,9 +399,14 @@ namespace RevitCleaner
             ViewModel.ExplorerItems.Clear();
             ViewModel.ShowedExplorerItems.Clear();
 
-            FilesInFolder(folderPath);
+            await Task.Run(() =>
+            {
+                FilesInFolder(folderPath);
+            });
+
             ViewModel.EnableControls = ViewModel.ExplorerItems.Count > 0;
             ViewModel.CountSelected();
+            DisplayFilteredElementsCount();
         }
 
         /// <summary>
@@ -428,6 +434,12 @@ namespace RevitCleaner
             }
 
             // Get Files in current folder.
+            this.DispatcherQueue.TryEnqueue(
+            Microsoft.UI.Dispatching.DispatcherQueuePriority.Normal,
+                () =>
+                {
+                    SelectionInformationBlock.Text = $"Recherche dans \n{folderPath}";
+                });
             List<FileInfo> curDirFiles = GetFiles(folderPath, false);
 
             // Fill Explorer items list with files.
@@ -515,26 +527,31 @@ namespace RevitCleaner
                     }
                 }
 
-                this.DispatcherQueue.TryEnqueue(
-                    Microsoft.UI.Dispatching.DispatcherQueuePriority.Normal,
-                    () =>
-                    {
-                        int fsc = ViewModel.ShowedExplorerItems.Count;
-                        int ftc = ViewModel.ExplorerItems.Count;
-                        string fs = ViewModel.ShowedExplorerItems.Count > 1 ? "s" : "";
-                        string ft = ViewModel.ExplorerItems.Count > 1 ? "s" : "";
-
-                        if (fsc <= 0)
-                        {
-                            SelectionInformationBlock.Text = $"Aucun fichier affiché / {ftc} fichier{ft}";
-                        }
-                        else
-                        {
-                            SelectionInformationBlock.Text = $"{fsc} fichier{fs} affiché{fs} / {ftc} fichier{ft}";
-                        }
-                    });
+                DisplayFilteredElementsCount();
 
             });
+        }
+
+        private void DisplayFilteredElementsCount()
+        {
+            this.DispatcherQueue.TryEnqueue(
+                Microsoft.UI.Dispatching.DispatcherQueuePriority.Normal,
+                () =>
+                {
+                    int fsc = ViewModel.ShowedExplorerItems.Count;
+                    int ftc = ViewModel.ExplorerItems.Count;
+                    string fs = ViewModel.ShowedExplorerItems.Count > 1 ? "s" : "";
+                    string ft = ViewModel.ExplorerItems.Count > 1 ? "s" : "";
+
+                    if (fsc <= 0)
+                    {
+                        SelectionInformationBlock.Text = $"Aucun fichier affiché / {ftc} fichier{ft}";
+                    }
+                    else
+                    {
+                        SelectionInformationBlock.Text = $"{fsc} fichier{fs} affiché{fs} / {ftc} fichier{ft}";
+                    }
+                });
         }
 
         private bool IsFilterOk(string filepath)
