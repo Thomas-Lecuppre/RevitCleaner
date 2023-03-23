@@ -30,6 +30,7 @@ using static System.Net.Mime.MediaTypeNames;
 using System.Xml.Linq;
 using System.Net;
 using static RevitCleaner.ExplorerItem;
+using Microsoft.WindowsAPICodePack.Dialogs;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -59,7 +60,7 @@ namespace RevitCleaner
             this.InitializeComponent();
 
             // New ViewModel parse to Page DataContext
-            ViewModel= new MainPageViewModel();
+            ViewModel = new MainPageViewModel();
             this.DataContext = ViewModel;
 
             ListDirectoryFilter = new List<string>();
@@ -83,21 +84,45 @@ namespace RevitCleaner
             UpDateFilterData();
             DisplayFilteredElementsCount();
             ViewModel.CountSelected();
+
         }
 
         private async void SearchButton_Click(object sender, RoutedEventArgs e)
         {
-            FolderPicker picker = new();
-            picker.SuggestedStartLocation = PickerLocationId.DocumentsLibrary;
-
-            var hwnd = WindowNative.GetWindowHandle(MainWindowView);
-            InitializeWithWindow.Initialize(picker, hwnd);
-
-            StorageFolder dir = await picker.PickSingleFolderAsync();
-
-            if(dir != null && Directory.Exists(dir.Path))
+            if(Environment.OSVersion.Version.Build >= 22000)
             {
-                DirectoryTextBox.Text= dir.Path;
+                FolderPicker picker = new Windows.Storage.Pickers.FolderPicker();
+                picker.SuggestedStartLocation = PickerLocationId.DocumentsLibrary;
+
+                var hwnd = WindowNative.GetWindowHandle(MainWindowView);
+                InitializeWithWindow.Initialize(picker, hwnd);
+
+                StorageFolder dir = await picker.PickSingleFolderAsync();
+
+                if (dir != null && Directory.Exists(dir.Path))
+                {
+                    DirectoryTextBox.Text = dir.Path;
+                }
+            }
+            else
+            {
+                // Création de la boite de dialogue pour la recherche de dossier.
+                CommonOpenFileDialog cofd = new CommonOpenFileDialog()
+                {
+                    Title = $"Dossier de recherche.",
+                    IsFolderPicker = true,
+                    Multiselect = false
+                };
+
+                CommonFileDialogResult r = cofd.ShowDialog();
+
+                if (r == CommonFileDialogResult.Ok)
+                {
+                    if (cofd.FileName != null && Directory.Exists(cofd.FileName))
+                    {
+                        DirectoryTextBox.Text = cofd.FileName;
+                    }
+                }
             }
         }
 

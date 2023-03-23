@@ -29,6 +29,7 @@
 		<PackageIcon>RFA_Cleaner_128px.png</PackageIcon>
 		<ApplicationIcon>Assets\RFA_Cleaner_32px.ico</ApplicationIcon>
 		<ApplicationManifest>app.manifest</ApplicationManifest>
+		<SupportedOSPlatformVersion>10.0.17763.0</SupportedOSPlatformVersion>
 	</PropertyGroup>
 	<ItemGroup>
 	  <None Remove="Assets\RFA_Cleaner_32px.ico" />
@@ -53,6 +54,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.1.0" />
+		<PackageReference Include="Microsoft-WindowsAPICodePack-Shell" Version="1.1.4" />
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
 		<PackageReference Include="Microsoft.WindowsAppSDK" Version="1.2.230118.102" />
 		<PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.22621.755" />
