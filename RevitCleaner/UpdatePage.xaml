@@ -111,6 +111,8 @@
                 Height="auto" />
             <RowDefinition
                 Height="auto" />
+            <RowDefinition
+                Height="auto" />
         </Grid.RowDefinitions>
 
         <TextBlock
@@ -156,6 +158,12 @@
             VerticalAlignment="Center"
             ClickMode="Release"
             Click="ContinueButton_Click" />
+
+        <TextBlock
+            x:Name="UpdateErrorBlock"
+            Grid.Row="5"
+            HorizontalAlignment="Center"
+            TextWrapping="WrapWholeWords" />
 
     </Grid>
 </Page>

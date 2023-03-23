@@ -53,7 +53,10 @@ namespace RevitCleaner
                     DeploymentOptions.ForceApplicationShutdown
                 );
             }
-            catch {}
+            catch (Exception ex)
+            {
+                UpdateErrorBlock.Text = $"{ex.Message}\n{ex.StackTrace}";
+            }
         }
 
         public void ShowChangeLog(List<string> changes)
