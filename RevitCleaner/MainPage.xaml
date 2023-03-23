@@ -7,8 +7,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     d:DataContext="{d:DesignInstance Type=local:MainPageViewModel}"
     mc:Ignorable="d"
-    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
-    Margin="0,14,0,0">
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
     <Page.Resources>
         <DataTemplate
@@ -316,7 +315,7 @@
 
     <Grid
         RowSpacing="5"
-        Margin="0,25,0,15">
+        Margin="0,0,0,15">
 
         <Grid.RowDefinitions>
             <!--Saisie du dossier de recherche-->
@@ -345,21 +344,6 @@
             <ColumnDefinition
                 Width="auto" />
         </Grid.ColumnDefinitions>
-        
-        <!--#region Alertes
-
-        <ScrollViewer
-            Grid.Column="1"
-            Grid.Row="0"
-            Grid.RowSpan="10"
-            MaxWidth="350">
-            <StackPanel
-                x:Name="AlertPanel"
-                HorizontalAlignment="Right"/>
-        </ScrollViewer>
-        
-
-        #endregion-->
 
         <!--#region Ligne saisie dossier-->
 
@@ -539,7 +523,8 @@
         <TextBlock
             x:Name="SelectionInformationBlock"
             Grid.Row="4"
-            HorizontalAlignment="Center"/>
+            HorizontalAlignment="Center"
+            TextWrapping="Wrap"/>
 
         <ToggleSwitch
             x:Name="DeleteReportSwitch"

@@ -12,6 +12,8 @@
         <Grid.RowDefinitions>
             <!--Entete-->
             <RowDefinition
+                Height="28" />
+            <RowDefinition
                 Height="*" />
         </Grid.RowDefinitions>
 
@@ -22,8 +24,7 @@
             Grid.Row="0"
             Spacing="15"
             Orientation="Horizontal"
-            VerticalAlignment="Top"
-            Height="28">
+            VerticalAlignment="Top">
 
             <Image
                 Source="Assets\RFA_Cleaner_128px.png"
@@ -39,8 +40,9 @@
 
         <!--#endregion-->
 
-        <local:MainPage
-            x:Name="FilesListPage" />
+        <Frame
+            x:Name="FilesListPage" 
+            Grid.Row="1"/>
 
     </Grid>
 </Window>

@@ -15,14 +15,14 @@
 		<AppxPackageSigningEnabled>True</AppxPackageSigningEnabled>
 		<PackageCertificateThumbprint>2E161127C2A20D2AFC0CB9E693F7ECE4D58CACBC</PackageCertificateThumbprint>
 		<AppxPackageSigningTimestampDigestAlgorithm>SHA256</AppxPackageSigningTimestampDigestAlgorithm>
-		<AppxAutoIncrementPackageRevision>False</AppxAutoIncrementPackageRevision>
+		<AppxAutoIncrementPackageRevision>True</AppxAutoIncrementPackageRevision>
 		<AppxSymbolPackageEnabled>False</AppxSymbolPackageEnabled>
 		<GenerateTestArtifacts>True</GenerateTestArtifacts>
 		<AppxBundle>Always</AppxBundle>
 		<AppInstallerUri>https://thomas-lecuppre.fr</AppInstallerUri>
 		<HoursBetweenUpdateChecks>0</HoursBetweenUpdateChecks>
 		<AppxPackageDir>C:\Users\thoma\source\repos\RevitCleaner\RevitCleaner\_Publish\</AppxPackageDir>
-		<AppxBundlePlatforms>x86|x64</AppxBundlePlatforms>
+		<AppxBundlePlatforms>x86|x64|arm64</AppxBundlePlatforms>
 		<Title>RevitCleaner</Title>
 		<PackageProjectUrl>https://app.thomas-lecuppre.fr/application-pour-revit/revit-cleaner</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/Thomas-Lecuppre/RevitCleaner</RepositoryUrl>
@@ -34,6 +34,7 @@
 	<ItemGroup>
 	  <None Remove="Assets\RFA_Cleaner_32px.ico" />
 	  <None Remove="MainPage.xaml" />
+	  <None Remove="UpdatePage.xaml" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -56,8 +57,8 @@
 		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.1.0" />
 		<PackageReference Include="Microsoft-WindowsAPICodePack-Shell" Version="1.1.4" />
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
-		<PackageReference Include="Microsoft.WindowsAppSDK" Version="1.2.230118.102" />
-		<PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.22621.755" />
+		<PackageReference Include="Microsoft.WindowsAppSDK" Version="1.2.230313.1" />
+		<PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.22621.756" />
 		<PackageReference Include="System.Security.Permissions" Version="7.0.0" />
 		<Manifest Include="$(ApplicationManifest)" />
 	</ItemGroup>
@@ -80,6 +81,11 @@
 	  <Content Update="Assets\RFA_Cleaner_32px.ico">
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </Content>
+	</ItemGroup>
+	<ItemGroup>
+	  <Page Update="UpdatePage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </Page>
 	</ItemGroup>
 	<ItemGroup>
 	  <Page Update="MainPage.xaml">
