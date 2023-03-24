@@ -55,7 +55,7 @@ namespace RevitCleaner
             }
             catch (Exception ex)
             {
-                UpdateErrorBlock.Text = $"{ex.Message}\n{ex.StackTrace}";
+                UpdateErrorBlock.Text = $"Une erreur c'est produite. Veuillez redémarrer votre ordinateur puis retenter la mise à jour. Si le problème persiste, communiquez ce code erreur : {ex.HResult}";
             }
         }
 

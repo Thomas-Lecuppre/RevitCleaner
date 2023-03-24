@@ -22,7 +22,7 @@
 		<AppInstallerUri>https://thomas-lecuppre.fr</AppInstallerUri>
 		<HoursBetweenUpdateChecks>0</HoursBetweenUpdateChecks>
 		<AppxPackageDir>C:\Users\thoma\source\repos\RevitCleaner\RevitCleaner\_Publish\</AppxPackageDir>
-		<AppxBundlePlatforms>x86|x64|arm64</AppxBundlePlatforms>
+		<AppxBundlePlatforms>x64</AppxBundlePlatforms>
 		<Title>RevitCleaner</Title>
 		<PackageProjectUrl>https://app.thomas-lecuppre.fr/application-pour-revit/revit-cleaner</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/Thomas-Lecuppre/RevitCleaner</RepositoryUrl>
