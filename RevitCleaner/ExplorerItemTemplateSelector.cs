@@ -18,7 +18,7 @@ namespace RevitCleaner
 
         protected override DataTemplate SelectTemplateCore(object item)
         {
-            var explorerItem = (ExplorerItem)item;  
+            var explorerItem = (ExplorerItem)item;
             if (explorerItem.Type == ExplorerItem.ExplorerItemType.RFAFile)
                 return RFAFileTemplate;
             if (explorerItem.Type == ExplorerItem.ExplorerItemType.RFTFile)
