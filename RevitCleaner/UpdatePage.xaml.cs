@@ -9,6 +9,8 @@ using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Navigation;
 using RevitCleaner.Helpers;
+using RevitCleaner.Strings;
+using RevitCleaner.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -30,10 +32,23 @@ namespace RevitCleaner
     {
         public string InfoUpdate { get; set; }
         public MainWindow MainWindowView { get; set; }
+        public ILanguage Lang { get; set; }
+        public UpdateViewModel ViewModel { get; set; }
+        public Version LastVersion { get; set; }
 
-        public UpdatePage()
+        public UpdatePage(ILanguage lang, Version lastVersion)
         {
             this.InitializeComponent();
+
+            Lang = lang;
+            LastVersion = lastVersion;
+
+            ViewModel = new UpdateViewModel()
+            {
+                Lang = lang,
+            };
+            ViewModel.UpdateInfos(LastVersion);
+            this.DataContext = ViewModel;
         }
 
         private void ContinueButton_Click(object sender, RoutedEventArgs e)
@@ -48,14 +63,13 @@ namespace RevitCleaner
             try
             {
                 await packagemanager.AddPackageAsync(
-                    new Uri("https://update.thomas-lecuppre.fr/RevitCleaner_lastest.msix"),
+                    new Uri("https://update.thomas-lecuppre.Lang_fr/RevitCleaner_lastest.msix"),
                     null,
-                    DeploymentOptions.ForceApplicationShutdown
-                );
+                    DeploymentOptions.ForceApplicationShutdown);
             }
             catch (Exception ex)
             {
-                UpdateErrorBlock.Text = $"Une erreur c'est produite. Veuillez redémarrer votre ordinateur puis retenter la mise à jour. Si le problème persiste, communiquez ce code erreur : {ex.HResult}";
+                ViewModel.ErrorMessage = ex.HResult.ToString();
             }
         }
 
@@ -90,6 +104,13 @@ namespace RevitCleaner
             {
                 ChangeLogList.Items.Add(cl);
             }
+        }
+
+        private void SkipButton_Click(object sender, RoutedEventArgs e)
+        {
+            MainWindowView.UserConf.SkipVersion = LastVersion;
+            MainWindowView.UserConf.Save();
+            MainWindowView.ShowMainPage();
         }
     }
 }
