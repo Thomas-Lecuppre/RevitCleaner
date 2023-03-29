@@ -113,12 +113,14 @@
                 Height="auto" />
             <RowDefinition
                 Height="auto" />
+            <RowDefinition
+                Height="auto" />
         </Grid.RowDefinitions>
 
         <TextBlock
             x:Name="InfoUpdateBlock"
             Grid.Row="0"
-            Text="{x:Bind InfoUpdate}" 
+            Text="{Binding UpdateTitle}" 
             FontSize="18"
             FontWeight="Bold"
             HorizontalTextAlignment="Center"
@@ -126,7 +128,7 @@
 
         <TextBlock
             Grid.Row="1"
-            Text="Note de version :"
+            Text="{x:Bind Lang.StrPatchNote}"
             HorizontalAlignment="Left"
             TextWrapping="WrapWholeWords" />
 
@@ -141,7 +143,7 @@
         <Button
             x:Name="UpdateButton"
             Grid.Row="3"
-            Content="Installer"
+            Content="{x:Bind Lang.StrInstall}"
             HorizontalAlignment="Stretch"
             HorizontalContentAlignment="Center"
             VerticalContentAlignment="Center"
@@ -152,17 +154,28 @@
         <Button
             x:Name="ContinueButton"
             Grid.Row="4"
-            Content="Continuer"
+            Content="{x:Bind Lang.StrContinue}"
             HorizontalAlignment="Stretch"
             HorizontalContentAlignment="Center"
             VerticalAlignment="Center"
             ClickMode="Release"
             Click="ContinueButton_Click" />
 
+        <Button
+            x:Name="SkipButton"
+            Grid.Row="5"
+            Content="{x:Bind Lang.StrSkip}"
+            HorizontalAlignment="Stretch"
+            HorizontalContentAlignment="Center"
+            VerticalAlignment="Center"
+            ClickMode="Release"
+            Click="SkipButton_Click"/>
+
         <TextBlock
             x:Name="UpdateErrorBlock"
-            Grid.Row="5"
+            Grid.Row="6"
             HorizontalAlignment="Center"
+            Text="{Binding ErrorMessage}"
             TextWrapping="WrapWholeWords" />
 
     </Grid>

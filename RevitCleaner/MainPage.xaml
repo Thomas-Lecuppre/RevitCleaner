@@ -61,7 +61,7 @@
                     Grid.Column="3"
                     Grid.RowSpan="2"
                     VerticalAlignment="Center"
-                    Content="Ouvrir"
+                    Content="{Binding Lang.Open}"
                     Tag="{Binding Path}"
                     Click="Button_Click" />
                 
@@ -120,7 +120,7 @@
                     Grid.Column="3"
                     Grid.RowSpan="2"
                     VerticalAlignment="Center"
-                    Content="Ouvrir"
+                    Content="{Binding Lang.ListItemOpenButtonText}"
                     Tag="{Binding Path}"
                     Click="Button_Click" />
 
@@ -179,7 +179,7 @@
                     Grid.Column="3"
                     Grid.RowSpan="2"
                     VerticalAlignment="Center"
-                    Content="Ouvrir"
+                    Content="{Binding Lang.ListItemOpenButtonText}"
                     Tag="{Binding Path}"
                     Click="Button_Click" />
 
@@ -238,7 +238,7 @@
                     Grid.Column="3"
                     Grid.RowSpan="2"
                     VerticalAlignment="Center"
-                    Content="Ouvrir"
+                    Content="{Binding Lang.ListItemOpenButtonText}"
                     Tag="{Binding Path}"
                     Click="Button_Click" />
 
@@ -297,7 +297,7 @@
                     Grid.Column="3"
                     Grid.RowSpan="2"
                     VerticalAlignment="Center"
-                    Content="Ouvrir"
+                    Content="{Binding Lang.ListItemOpenButtonText}"
                     Tag="{Binding Path}"
                     Click="Button_Click" />
 
@@ -315,19 +315,15 @@
 
     <Grid
         RowSpacing="5"
-        Margin="0,0,0,15">
+        Margin="10">
 
         <Grid.RowDefinitions>
-            <!--Saisie du dossier de recherche-->
             <RowDefinition
                 Height="auto" />
-            <!--Saisie du filtre de recherche-->
             <RowDefinition
                 Height="auto" />
-            <!--Option du filtre-->
             <RowDefinition
                 Height="auto" />
-            <!--Liste-->
             <RowDefinition
                 Height="*" />
             <RowDefinition
@@ -349,7 +345,6 @@
 
         <Grid
             Grid.Row="0"
-            Margin="10,0"
             HorizontalAlignment="Stretch"
             ColumnSpacing="10">
 
@@ -368,10 +363,10 @@
                 HorizontalTextAlignment="Left"
                 VerticalContentAlignment="Center"
                 HorizontalAlignment="Stretch"
-                Header="Dossier de recherche :"
+                Header="{x:Bind Lang.DirectoryTextBoxHeader}"
                 PlaceholderText="C:\..." 
                 TextChanged="DirectoryTextBox_TextChanged"
-                ToolTipService.ToolTip="Indiquez le dossier dans lequel chercher les éléments à nettoyer." />
+                ToolTipService.ToolTip="{x:Bind Lang.DirectoryTextBoxToolTip}" />
 
             <Button
                 x:Name="RefreshButton"
@@ -380,7 +375,7 @@
                 VerticalAlignment="Bottom"
                 ClickMode="Release"
                 Click="RefreshButton_Click"
-                ToolTipService.ToolTip="Rafraichir la liste des fichiers du dossier.">
+                ToolTipService.ToolTip="{x:Bind Lang.RefreshButtonToolTip}">
                 <SymbolIcon
                     Symbol="SyncFolder" />
             </Button>
@@ -393,9 +388,9 @@
                 Style="{StaticResource AccentButtonStyle}"
                 ClickMode="Release"
                 Click="SearchButton_Click"
-                ToolTipService.ToolTip="Ouvrir un explorateur de dossier.">
-                <SymbolIcon
-                    Symbol="More" />
+                ToolTipService.ToolTip="{x:Bind Lang.SearchButtonTooTip}">
+                <FontIcon
+                    Glyph="&#xE721;"/>
             </Button>
 
         </Grid>
@@ -412,8 +407,8 @@
 
             <TextBox
                 x:Name="SearchTextBox"
-                Header="Filtre de recherche :"
-                PlaceholderText="Project, Modèle générique, @Etudes"
+                Header="{x:Bind Lang.SearchTextBoxHeader}"
+                PlaceholderText="{x:Bind Lang.SearchTextBoxPlaceHolder}"
                 ToolTipService.ToolTip="{Binding SearchToolTip}"
                 TextChanged="SearchTextBox_TextChanged" 
                 KeyDown="SearchTextBox_KeyDown"
@@ -421,8 +416,9 @@
 
             <ToggleSwitch
                 x:Name="CaseSensitiveToggleSwitch"
-                OnContent="Recherche stricte activée"
-                OffContent="Recherche stricte désactivée"
+                OnContent="{x:Bind Lang.CaseSensitiveToggleSwitchOn}"
+                OffContent="{x:Bind Lang.CaseSensitiveToggleSwitchOff}"
+                IsOn="{Binding IsCaseSensitiveOn}"
                 Toggled="CaseSensitiveToggleSwitch_Toggled"
                 IsEnabled="{Binding EnableControls}" />
 
@@ -442,7 +438,6 @@
         <!--#region Gestion de la sélection-->
 
         <StackPanel Grid.Row="2"
-                    Margin="10,0"
                     Orientation="Vertical"
                     HorizontalAlignment="Stretch">
 
@@ -453,29 +448,29 @@
                 HorizontalAlignment="Stretch">
 
                 <TextBlock
-                    Text="Actions globales :" />
+                    Text="{x:Bind Lang.GlobalActionTitle}" />
 
                 <Button
                     x:Name="SelectAll"
-                    Content="Tout cocher"
+                    Content="{x:Bind Lang.SelectAllText}"
                     Padding="3"
-                    ToolTipService.ToolTip="Coche tous les éléments sans tenir compte du filtre."
+                    ToolTipService.ToolTip="{x:Bind Lang.SelectAllToolTip}"
                     Click="SelectAll_Click"
                     IsEnabled="{Binding EnableControls}" />
 
                 <Button
                     x:Name="UnselectAll"
-                    Content="Tout décocher"
+                    Content="{x:Bind Lang.UnSelectAllText}"
                     Padding="3"
-                    ToolTipService.ToolTip="Décoche tous les éléments sans tenir compte du filtre."
+                    ToolTipService.ToolTip="{x:Bind Lang.UnSelectAllToolTip}"
                     Click="UnselectAll_Click"
                     IsEnabled="{Binding EnableControls}" />
 
                 <Button
                     x:Name="InvertAll"
-                    Content="Tout inverser"
+                    Content="{x:Bind Lang.InvertAllText}"
                     Padding="3"
-                    ToolTipService.ToolTip="Inverse la sélection de tous les éléments sans tenir compte du filtre."
+                    ToolTipService.ToolTip="{x:Bind Lang.InvertAllToolTip}"
                     Click="InvertAll_Click"
                     IsEnabled="{Binding EnableControls}" />
 
@@ -488,29 +483,29 @@
                 HorizontalAlignment="Stretch">
 
                 <TextBlock
-                    Text="Actions sur la sélection :" />
+                    Text="{x:Bind Lang.FilteredActionTiTle}" />
 
                 <Button
                     x:Name="SelectSelection"
-                    Content="Cocher filtrés"
+                    Content="{x:Bind Lang.FilteredSelectAllText}"
                     Padding="3"
-                    ToolTipService.ToolTip="Coche tout les éléments filtrés."
+                    ToolTipService.ToolTip="{x:Bind Lang.FilteredSelectAllToolTip}"
                     Click="SelectSelection_Click"
                     IsEnabled="{Binding EnableControls}" />
 
                 <Button
                     x:Name="UnselectSelection"
-                    Content="Décocher filtrés"
+                    Content="{x:Bind Lang.FilteredUnSelectAllText}"
                     Padding="3"
-                    ToolTipService.ToolTip="Décoche tout les éléments filtrés."
+                    ToolTipService.ToolTip="{x:Bind Lang.FilteredUnSelectAllToolTip}"
                     Click="UnselectSelection_Click"
                     IsEnabled="{Binding EnableControls}" />
 
                 <Button
                     x:Name="InvertSelection"
-                    Content="Inverser filtrés"
+                    Content="{x:Bind Lang.FilteredInvertAllText}"
                     Padding="3"
-                    ToolTipService.ToolTip="Inverse la sélection de tout les éléments filtrés."
+                    ToolTipService.ToolTip="{x:Bind Lang.FilteredInvertAllToolTip}"
                     Click="InvertSelection_Click"
                     IsEnabled="{Binding EnableControls}" />
 
@@ -519,20 +514,23 @@
         </StackPanel>
         
         <!--#endregion-->
-
+        
+        <!--#region Infos et suppression-->
+        
         <TextBlock
             x:Name="SelectionInformationBlock"
             Grid.Row="4"
             HorizontalAlignment="Center"
+            Text="{Binding ShowedFilesCounter}"
             TextWrapping="Wrap"/>
 
         <ToggleSwitch
             x:Name="DeleteReportSwitch"
             Grid.Row="5"
             HorizontalAlignment="Center"
-            OnContent="Générer un rapport de suppression"
-            OffContent="Ne pas générer de rapport de suppression"
-            ToolTipService.ToolTip="Les rapports de suppresion se trouve dans ..\Mes Documents\Revit Cleaner Reports"
+            OnContent="{x:Bind Lang.DeleteReportSwitchOn}"
+            OffContent="{x:Bind Lang.DeleteReportSwitchOff}"
+            ToolTipService.ToolTip="{x:Bind Lang.DeleteReportSwitchToolTip}"
             IsEnabled="{Binding EnableControls}" />
 
         <Button
@@ -540,11 +538,49 @@
             Grid.Row="6"
             HorizontalAlignment="Center"
             Style="{StaticResource AccentButtonStyle}"
-            Content="{Binding FileCounter}"
+            Content="{Binding CleanButtonText}"
             ClickMode="Release"
             Click="DeleteFilesButton_Click"
             IsEnabled="{Binding ClearButtonState}"
-            ToolTipService.ToolTip="Cette action est irréversible. Réfléchissez avant de cliquer." />
+            ToolTipService.ToolTip="{x:Bind Lang.DeleteButtonToolTip}" />
+        
+        <!--#endregion-->
+        
+        <!--#region Pied de page-->
 
+        <DropDownButton
+            x:Name="LocalizationDropDown"
+            Grid.Row="6"
+            HorizontalAlignment="Right"
+            VerticalAlignment="Bottom">
+            <DropDownButton.Content>
+                <FontIcon
+                    Glyph="&#xF2B7;" />
+            </DropDownButton.Content>
+            <DropDownButton.Flyout>
+                <MenuFlyout
+                    Placement="TopEdgeAlignedRight">
+                    <MenuFlyoutItem
+                        Text="English"
+                        ToolTipService.ToolTip="Traduit par Thomas Lecuppre"
+                        Click="MenuFlyoutItem_Click" 
+                        Tag="en"/>
+                    <MenuFlyoutItem
+                        Text="Français"
+                        ToolTipService.ToolTip="Traduit par Thomas Lecuppre"
+                        Click="MenuFlyoutItem_Click"
+                        Tag="fr"/>
+                    <MenuFlyoutItem
+                        Text="Português"
+                        ToolTipService.ToolTip="{x:Bind Lang.TranslateAutor}"
+                        Click="MenuFlyoutItem_Click" 
+                        Tag="pt"/>
+                </MenuFlyout>
+            </DropDownButton.Flyout>
+            
+        </DropDownButton>
+
+        <!--#endregion-->
+        
     </Grid>
 </Page>

@@ -31,6 +31,7 @@ using System.Xml.Linq;
 using System.Net;
 using static RevitCleaner.ExplorerItem;
 using Microsoft.WindowsAPICodePack.Dialogs;
+using RevitCleaner.Strings;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -44,6 +45,7 @@ namespace RevitCleaner
     {
         public MainWindow MainWindowView { get; set; }
         public MainPageViewModel ViewModel { get; set; }
+        private ILanguage Lang { get; set; }
 
         // Listes of different kind of filter.
         private List<string> ListDirectoryFilter { get; set; }
@@ -55,12 +57,13 @@ namespace RevitCleaner
         private bool IsCaseSensitive { get; set; }
         private bool NeedConfirmation { get; set; }
 
-        public MainPage()
+        public MainPage(ILanguage lang)
         {
             this.InitializeComponent();
 
             // New ViewModel parse to Page DataContext
-            ViewModel = new MainPageViewModel();
+            Lang = lang;
+            ViewModel = new MainPageViewModel(Lang);
             this.DataContext = ViewModel;
 
             ListDirectoryFilter = new List<string>();
@@ -74,16 +77,12 @@ namespace RevitCleaner
             CaseSensitiveToggleSwitch.IsOn = false;
             DeleteReportSwitch.IsOn = false;
             RefreshButton.IsEnabled = false;
-            ViewModel.SearchToolTip = "C'est dans cette zone que vous pouvez filtrer la liste des éléments trouvés." +
-                "\nSéparez tous vos composants de filtre par \",\"." +
-                "\nLa recherche ne tient plus compte des majuscules et minuscules." +
-                "\n\nPour obtenir plus d'informations sur les fonctionnalités et raccourcis possibles appuyez sur \"F1\".";
 
             NeedConfirmation = true;
 
             UpDateFilterData();
-            DisplayFilteredElementsCount();
-            ViewModel.CountSelected();
+            ViewModel.DisplayShowedCount();
+            ViewModel.DisplaySelectedCount();
 
         }
 
@@ -129,32 +128,21 @@ namespace RevitCleaner
         private void SearchTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             UpDateFilterData();
-            ShowInUI();
+            ShowInUIAsync();
         }
 
         private void CaseSensitiveToggleSwitch_Toggled(object sender, RoutedEventArgs e)
         {
-            ViewModel.SearchToolTip = CaseSensitiveToggleSwitch.IsOn ?
-                "C'est dans cette zone que vous pouvez filtrer la liste des éléments trouvés." +
-                "\nSéparez tous vos composants de filtre par \",\"." +
-                "\nLa recherche ne tient compte des majuscules et minuscules." +
-                "\n\nPour obtenir plus d'informations sur les fonctionnalités et raccourcis possibles appuyez sur \"F1\"."
-                :
-                "C'est dans cette zone que vous pouvez filtrer la liste des éléments trouvés." +
-                "\nSéparez tous vos composants de filtre par \",\"." +
-                "\nLa recherche ne tient plus compte des majuscules et minuscules." +
-                "\n\nPour obtenir plus d'informations sur les fonctionnalités et raccourcis possibles appuyez sur \"F1\".";
-
             UpDateFilterData();
-            ShowInUI();
+            ShowInUIAsync();
         }
 
         private void DeleteFilesButton_Click(object sender, RoutedEventArgs e)
         {
-            if(DeleteFilesButton.Content.ToString() == ViewModel.FileCounter && NeedConfirmation)
+            if(DeleteFilesButton.Content.ToString() == ViewModel.CleanButtonText && NeedConfirmation)
             {
                 NeedConfirmation = false;
-                ViewModel.FileCounter = "Presser une seconde fois pour confirmer";
+                ViewModel.CleanButtonText = Lang.DeleteButtonConfirmMessage;
             }
             else
             {
@@ -430,8 +418,8 @@ namespace RevitCleaner
             });
 
             ViewModel.EnableControls = ViewModel.ExplorerItems.Count > 0;
-            ViewModel.CountSelected();
-            DisplayFilteredElementsCount();
+            ViewModel.DisplayShowedCount();
+            ViewModel.DisplaySelectedCount();
         }
 
         /// <summary>
@@ -463,7 +451,7 @@ namespace RevitCleaner
             Microsoft.UI.Dispatching.DispatcherQueuePriority.Normal,
                 () =>
                 {
-                    SelectionInformationBlock.Text = $"Recherche dans \n{folderPath}";
+                    ViewModel.ShowedFilesCounter = $"{Lang.StrLookInto} \n{folderPath}";
                 });
             List<FileInfo> curDirFiles = GetFiles(folderPath, false);
 
@@ -483,7 +471,7 @@ namespace RevitCleaner
 
                 ExplorerItemType eit = GetUIFileType(file);
 
-                ExplorerItem item = new ExplorerItem(this.ViewModel)
+                ExplorerItem item = new ExplorerItem(this.ViewModel, Lang)
                 {
                     Name = file.Name.Replace(file.Extension, string.Empty),
                     Path = file.FullName,
@@ -519,11 +507,11 @@ namespace RevitCleaner
             }
         }
 
-        private void ShowInUI()
+        private async void ShowInUIAsync()
         {
-            ViewModel.CountSelected();
+            ViewModel.DisplaySelectedCount();
             // Add them in UI
-            Task.Run(() =>
+            await Task.Run(() =>
             {
                 ViewModel.ShowedExplorerItems.Clear();
 
@@ -552,31 +540,9 @@ namespace RevitCleaner
                     }
                 }
 
-                DisplayFilteredElementsCount();
-
             });
-        }
 
-        private void DisplayFilteredElementsCount()
-        {
-            this.DispatcherQueue.TryEnqueue(
-                Microsoft.UI.Dispatching.DispatcherQueuePriority.Normal,
-                () =>
-                {
-                    int fsc = ViewModel.ShowedExplorerItems.Count;
-                    int ftc = ViewModel.ExplorerItems.Count;
-                    string fs = ViewModel.ShowedExplorerItems.Count > 1 ? "s" : "";
-                    string ft = ViewModel.ExplorerItems.Count > 1 ? "s" : "";
-
-                    if (fsc <= 0)
-                    {
-                        SelectionInformationBlock.Text = $"Aucun fichier affiché / {ftc} fichier{ft}";
-                    }
-                    else
-                    {
-                        SelectionInformationBlock.Text = $"{fsc} fichier{fs} affiché{fs} / {ftc} fichier{ft}";
-                    }
-                });
+            ViewModel.DisplayShowedCount();
         }
 
         private bool IsFilterOk(string filepath)
@@ -752,7 +718,7 @@ namespace RevitCleaner
             VirtualKey key= e.Key;
             if(key == VirtualKey.F1)
             {
-                Process.Start(@"https://app.thomas-lecuppre.fr/application-pour-revit/revit-cleaner#filtrer-dans-revit-cleaner");
+                Process.Start(@"https://app.thomas-lecuppre.Lang_fr/application-pour-revit/revit-cleaner#filtrer-dans-revit-cleaner");
             }
         }
 
@@ -764,6 +730,36 @@ namespace RevitCleaner
                 UpDateFilterData();
                 ParseFilesToUI(DirectoryTextBox.Text);
             }
+        }
+
+        private void MenuFlyoutItem_Click(object sender, RoutedEventArgs e)
+        {
+            MenuFlyoutItem mfi = (MenuFlyoutItem)sender;
+
+            switch(mfi.Tag.ToString())
+            {
+                case "en":
+                    {
+                        Lang = new Lang_en();
+                        break;
+                    }
+                case "pt":
+                    {
+                        Lang = new Lang_pt();
+                        break;
+                    }
+                default :
+                    {
+                        Lang = new Lang_fr();
+                        break;
+                    }
+            }
+
+            MainWindowView.UserConf.LangId = mfi.Tag.ToString();
+            MainWindowView.UserConf.Save();
+
+            Bindings.Update();
+            ViewModel.DisplayShowedCount();
         }
     }
 }
