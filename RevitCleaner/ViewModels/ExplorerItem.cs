@@ -29,7 +29,31 @@ namespace RevitCleaner
 
         public bool IsShowed { get; set; }
 
-        public ILanguage Lang { get; set; }
+        private string openText;
+
+        public string OpenText
+        {
+            get { return openText; }
+            set 
+            { 
+                openText = value; 
+                NotifyPropertyChanged(nameof(OpenText));
+            }
+        }
+
+
+        private ILanguage lang;
+
+        public ILanguage Lang
+        {
+            get { return lang; }
+            set 
+            { 
+                lang = value;
+                OpenText = value.ListItemOpenButtonText;
+            }
+        }
+
 
         public ExplorerItem(MainPageViewModel mainPage, ILanguage lang)
         {

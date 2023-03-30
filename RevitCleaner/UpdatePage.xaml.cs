@@ -14,8 +14,11 @@ using RevitCleaner.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Packaging;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Threading;
+using System.Threading.Tasks;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.Management.Deployment;
@@ -36,7 +39,7 @@ namespace RevitCleaner
         public UpdateViewModel ViewModel { get; set; }
         public Version LastVersion { get; set; }
 
-        public UpdatePage(ILanguage lang, Version lastVersion)
+        public UpdatePage(ILanguage lang,Version currentVersion , Version lastVersion, List<string> content)
         {
             this.InitializeComponent();
 
@@ -47,8 +50,10 @@ namespace RevitCleaner
             {
                 Lang = lang,
             };
-            ViewModel.UpdateInfos(LastVersion);
+            ViewModel.UpdateInfos(currentVersion, LastVersion);
             this.DataContext = ViewModel;
+
+            ShowChangeLog(content);
         }
 
         private void ContinueButton_Click(object sender, RoutedEventArgs e)
@@ -58,6 +63,12 @@ namespace RevitCleaner
 
         private async void UpdateButton_Click(object sender, RoutedEventArgs e)
         {
+            UpdateButton.IsEnabled = false;
+            ContinueButton.IsEnabled = false;
+            SkipButton.IsEnabled = false;
+
+            UpdateProgressBar.Visibility = Visibility.Visible;
+
             PackageManager packagemanager = new PackageManager();
             uint res = RelaunchHelper.RegisterApplicationRestart(null, RelaunchHelper.RestartFlags.NONE);
             try

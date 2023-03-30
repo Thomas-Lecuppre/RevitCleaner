@@ -61,7 +61,7 @@
                     Grid.Column="3"
                     Grid.RowSpan="2"
                     VerticalAlignment="Center"
-                    Content="{Binding Lang.Open}"
+                    Content="{Binding OpenText}"
                     Tag="{Binding Path}"
                     Click="Button_Click" />
                 

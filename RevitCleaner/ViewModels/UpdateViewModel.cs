@@ -1,6 +1,7 @@
 ﻿using RevitCleaner.Strings;
 using System;
 using System.Collections.Generic;
+using System.IO.Packaging;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -44,9 +45,9 @@ namespace RevitCleaner.ViewModels
             }
 		}
 
-		public void UpdateInfos(Version newVersion)
+		public void UpdateInfos(Version currentVersion, Version newVersion)
 		{
-			UpdateTitle = Lang.StrUpdateTo.Replace("$1", "").Replace("$2", newVersion.ToString());
+            UpdateTitle = Lang.StrUpdateTo.Replace("$1", currentVersion.ToString()).Replace("$2", newVersion.ToString());
 		}
 
 	}

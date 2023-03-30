@@ -33,8 +33,6 @@ namespace RevitCleaner
             set 
             { 
                 lang = value;
-                DisplayShowedCount();
-                DisplaySelectedCount();
             }
         }
 
@@ -166,6 +164,14 @@ namespace RevitCleaner
 
         #endregion
 
+        public void UpdateLanguage(ILanguage language)
+        {
+            Lang = language;
+            DisplayShowedCount();
+            DisplaySelectedCount();
+            UpdateExplorerItemLang();
+        }
+
         public void DisplayShowedCount()
         {
             string totalCount = "";
@@ -232,6 +238,14 @@ namespace RevitCleaner
                 }
             }
             catch { }
+        }
+
+        private void UpdateExplorerItemLang()
+        {
+            foreach(ExplorerItem item in ExplorerItems)
+            {
+                item.Lang = Lang;
+            }
         }
 
         private static string ReduceSize(long size)

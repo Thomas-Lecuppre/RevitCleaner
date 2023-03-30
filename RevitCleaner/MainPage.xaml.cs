@@ -755,11 +755,14 @@ namespace RevitCleaner
                     }
             }
 
+            ViewModel.UpdateLanguage(Lang);
+
+            ShowInUIAsync();
+
             MainWindowView.UserConf.LangId = mfi.Tag.ToString();
             MainWindowView.UserConf.Save();
 
             Bindings.Update();
-            ViewModel.DisplayShowedCount();
         }
     }
 }

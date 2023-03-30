@@ -49,7 +49,7 @@ namespace RevitCleaner.Strings
         public string StrOneShowedFile => "";
         public string StrMultipleShowedFile => "";
         public string StrFile => "";
-        public string StrFiles => "f";
+        public string StrFiles => "";
         public string StrLookInto => "";
         public string StrNoFileToClean => "";
         public string StrOneFileToClean => "";

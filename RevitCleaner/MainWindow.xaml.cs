@@ -103,7 +103,7 @@ namespace RevitCleaner
                 //Si la version nouvelle est au dessus de la version skipper alors on l'affiche.
                 if (newVersion.CompareTo(currentVersion) > 0 && newVersion.CompareTo(UserConf.SkipVersion) > 0)
                 {
-                    ShowUpdatePage(newVersion);
+                    ShowUpdatePage(currentVersion, newVersion, contentAr.Skip(1).ToList());
                 }
                 else
                 {
@@ -122,9 +122,9 @@ namespace RevitCleaner
         /// Affiche la page qui traite des mises à jour de l'application.
         /// </summary>
         /// <param name="newVersion">La valeur de la version de la nouvelle mise à jour.</param>
-        private void ShowUpdatePage(Version newVersion)
+        private void ShowUpdatePage(Version currentVersion,Version newVersion, List<string> content)
         {
-            UpdatePage up = new UpdatePage(Lang, newVersion)
+            UpdatePage up = new UpdatePage(Lang,currentVersion, newVersion, content)
             {
                 MainWindowView = this
             };
