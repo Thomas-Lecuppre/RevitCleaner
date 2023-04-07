@@ -552,7 +552,8 @@
             x:Name="LocalizationDropDown"
             Grid.Row="6"
             HorizontalAlignment="Right"
-            VerticalAlignment="Bottom">
+            VerticalAlignment="Bottom"
+            ToolTipService.ToolTip="{x:Bind Lang.TranslateAuthor}">
             <DropDownButton.Content>
                 <FontIcon
                     Glyph="&#xF2B7;" />
@@ -562,19 +563,12 @@
                     Placement="TopEdgeAlignedRight">
                     <MenuFlyoutItem
                         Text="English"
-                        ToolTipService.ToolTip="Traduit par Thomas Lecuppre"
                         Click="MenuFlyoutItem_Click" 
                         Tag="en"/>
                     <MenuFlyoutItem
                         Text="Français"
-                        ToolTipService.ToolTip="Traduit par Thomas Lecuppre"
                         Click="MenuFlyoutItem_Click"
-                        Tag="fr"/>
-                    <MenuFlyoutItem
-                        Text="Português"
-                        ToolTipService.ToolTip="{x:Bind Lang.TranslateAutor}"
-                        Click="MenuFlyoutItem_Click" 
-                        Tag="pt"/>
+                        Tag="fr" />
                 </MenuFlyout>
             </DropDownButton.Flyout>
             

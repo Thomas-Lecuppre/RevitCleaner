@@ -9,7 +9,7 @@ namespace RevitCleaner.Strings
     public interface ILanguage
     {
         public string Id => "";
-        public string TranslateAutor => "";
+        public string TranslateAuthor => "";
         public string LanguageName => "";
         public string DirectoryTextBoxHeader => "";
         public string DirectoryTextBoxToolTip => "";

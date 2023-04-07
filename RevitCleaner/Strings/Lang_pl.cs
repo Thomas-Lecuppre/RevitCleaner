@@ -4,7 +4,7 @@ namespace RevitCleaner.Strings
     public class Lang_pl : ILanguage
     {
         public string Id => "pl";
-        public string TranslateAutor => "-";
+        public string TranslateAuthor => "-";
         public string LanguageName => "Polish";
 
         /// <summary>
