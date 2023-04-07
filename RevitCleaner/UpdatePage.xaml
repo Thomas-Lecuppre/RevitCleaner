@@ -92,7 +92,7 @@
             UpdateChangeLog="{StaticResource UpdateChangeLog}"
             RemoveChangeLog="{StaticResource RemoveChangeLog}"/>
     </Page.Resources>
-
+    
     <Grid 
         VerticalAlignment="Center"
         HorizontalAlignment="Center"
@@ -113,20 +113,34 @@
                 Height="auto" />
             <RowDefinition
                 Height="auto" />
+            <RowDefinition
+                Height="auto" />
         </Grid.RowDefinitions>
 
-        <TextBlock
-            x:Name="InfoUpdateBlock"
-            Grid.Row="0"
-            Text="{x:Bind InfoUpdate}" 
-            FontSize="18"
-            FontWeight="Bold"
-            HorizontalTextAlignment="Center"
-            TextWrapping="WrapWholeWords" />
+        <StackPanel
+            Orientation="Vertical"
+            HorizontalAlignment="Center"
+            Grid.Row="0">
+
+            <TextBlock
+                x:Name="InfoUpdateBlock"
+                Grid.Row="0"
+                Text="{Binding UpdateTitle}"
+                FontSize="18"
+                FontWeight="Bold"
+                HorizontalTextAlignment="Center"
+                TextWrapping="WrapWholeWords" />
+
+            <ProgressBar
+                x:Name="UpdateProgressBar"
+                Visibility="Collapsed"
+                IsIndeterminate="True" />
+
+        </StackPanel>
 
         <TextBlock
             Grid.Row="1"
-            Text="Note de version :"
+            Text="{x:Bind Lang.StrPatchNote}"
             HorizontalAlignment="Left"
             TextWrapping="WrapWholeWords" />
 
@@ -141,28 +155,70 @@
         <Button
             x:Name="UpdateButton"
             Grid.Row="3"
-            Content="Installer"
             HorizontalAlignment="Stretch"
             HorizontalContentAlignment="Center"
             VerticalContentAlignment="Center"
             Style="{StaticResource AccentButtonStyle}"
             ClickMode="Release"
-            Click="UpdateButton_Click" />
+            Click="UpdateButton_Click">
+
+            <StackPanel
+                Orientation="Horizontal"
+                Height="30">
+                <FontIcon
+                    Glyph="&#xE896;" />
+                <TextBlock
+                    VerticalAlignment="Center"
+                    Text="{x:Bind Lang.StrInstall}" />
+            </StackPanel>
+            
+        </Button>
 
         <Button
             x:Name="ContinueButton"
             Grid.Row="4"
-            Content="Continuer"
             HorizontalAlignment="Stretch"
             HorizontalContentAlignment="Center"
             VerticalAlignment="Center"
             ClickMode="Release"
-            Click="ContinueButton_Click" />
+            Click="ContinueButton_Click">
+
+            <StackPanel
+                Orientation="Horizontal"
+                Height="30">
+                <FontIcon
+                    Glyph="&#xE768;" />
+                <TextBlock
+                    VerticalAlignment="Center"
+                    Text="{x:Bind Lang.StrContinue}" />
+            </StackPanel>
+        </Button>
+
+        <Button
+            x:Name="SkipButton"
+            Grid.Row="5"
+            HorizontalAlignment="Stretch"
+            HorizontalContentAlignment="Center"
+            VerticalAlignment="Center"
+            ClickMode="Release"
+            Click="SkipButton_Click">
+
+            <StackPanel
+                Orientation="Horizontal"
+                Height="30">
+                <FontIcon
+                    Glyph="&#xEB9D;" />
+                <TextBlock
+                    VerticalAlignment="Center"
+                    Text="{x:Bind Lang.StrSkip}" />
+            </StackPanel>
+        </Button>
 
         <TextBlock
             x:Name="UpdateErrorBlock"
-            Grid.Row="5"
+            Grid.Row="6"
             HorizontalAlignment="Center"
+            Text="{Binding ErrorMessage}"
             TextWrapping="WrapWholeWords" />
 
     </Grid>

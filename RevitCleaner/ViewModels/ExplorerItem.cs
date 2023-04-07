@@ -1,12 +1,13 @@
-﻿using System.Collections.ObjectModel;
+﻿using RevitCleaner.Strings;
+using RevitCleaner.ViewModels;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 
 namespace RevitCleaner
 {
-    public class ExplorerItem : INotifyPropertyChanged
+    public class ExplorerItem : BaseViewModel
     {
-        public event PropertyChangedEventHandler PropertyChanged;
         public enum ExplorerItemType { Folder, RFAFile, RFTFile, RTEFile, RVTFile, UnknowFile };
         public string Name { get; set; }
         public string Path { get; set; }
@@ -21,21 +22,43 @@ namespace RevitCleaner
             {
                 isSelected = value;
                 NotifyPropertyChanged("IsSelected");
-                _mainPage.CountSelected();
+                _mainPage.DisplaySelectedCount();
             }
 
         }
 
         public bool IsShowed { get; set; }
 
-        private void NotifyPropertyChanged(string propertyName)
+        private string openText;
+
+        public string OpenText
         {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            get { return openText; }
+            set 
+            { 
+                openText = value; 
+                NotifyPropertyChanged(nameof(OpenText));
+            }
         }
 
-        public ExplorerItem(MainPageViewModel mainPage)
+
+        private ILanguage lang;
+
+        public ILanguage Lang
+        {
+            get { return lang; }
+            set 
+            { 
+                lang = value;
+                OpenText = value.ListItemOpenButtonText;
+            }
+        }
+
+
+        public ExplorerItem(MainPageViewModel mainPage, ILanguage lang)
         {
             _mainPage = mainPage;
+            Lang = lang;
         }
 
         private MainPageViewModel _mainPage { get; set; }

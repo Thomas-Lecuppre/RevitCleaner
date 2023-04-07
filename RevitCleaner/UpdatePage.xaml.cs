@@ -9,11 +9,16 @@ using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Navigation;
 using RevitCleaner.Helpers;
+using RevitCleaner.Strings;
+using RevitCleaner.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Packaging;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Threading;
+using System.Threading.Tasks;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.Management.Deployment;
@@ -30,10 +35,25 @@ namespace RevitCleaner
     {
         public string InfoUpdate { get; set; }
         public MainWindow MainWindowView { get; set; }
+        public ILanguage Lang { get; set; }
+        public UpdateViewModel ViewModel { get; set; }
+        public Version LastVersion { get; set; }
 
-        public UpdatePage()
+        public UpdatePage(ILanguage lang,Version currentVersion , Version lastVersion, List<string> content)
         {
             this.InitializeComponent();
+
+            Lang = lang;
+            LastVersion = lastVersion;
+
+            ViewModel = new UpdateViewModel()
+            {
+                Lang = lang,
+            };
+            ViewModel.UpdateInfos(currentVersion, LastVersion);
+            this.DataContext = ViewModel;
+
+            ShowChangeLog(content);
         }
 
         private void ContinueButton_Click(object sender, RoutedEventArgs e)
@@ -43,19 +63,24 @@ namespace RevitCleaner
 
         private async void UpdateButton_Click(object sender, RoutedEventArgs e)
         {
+            UpdateButton.IsEnabled = false;
+            ContinueButton.IsEnabled = false;
+            SkipButton.IsEnabled = false;
+
+            UpdateProgressBar.Visibility = Visibility.Visible;
+
             PackageManager packagemanager = new PackageManager();
             uint res = RelaunchHelper.RegisterApplicationRestart(null, RelaunchHelper.RestartFlags.NONE);
             try
             {
                 await packagemanager.AddPackageAsync(
-                    new Uri("https://update.thomas-lecuppre.fr/RevitCleaner_lastest.msix"),
+                    new Uri("https://update.thomas-lecuppre.Lang_fr/RevitCleaner_lastest.msix"),
                     null,
-                    DeploymentOptions.ForceApplicationShutdown
-                );
+                    DeploymentOptions.ForceApplicationShutdown);
             }
             catch (Exception ex)
             {
-                UpdateErrorBlock.Text = $"Une erreur c'est produite. Veuillez redémarrer votre ordinateur puis retenter la mise à jour. Si le problème persiste, communiquez ce code erreur : {ex.HResult}";
+                ViewModel.ErrorMessage = ex.HResult.ToString();
             }
         }
 
@@ -90,6 +115,13 @@ namespace RevitCleaner
             {
                 ChangeLogList.Items.Add(cl);
             }
+        }
+
+        private void SkipButton_Click(object sender, RoutedEventArgs e)
+        {
+            MainWindowView.UserConf.SkipVersion = LastVersion;
+            MainWindowView.UserConf.Save();
+            MainWindowView.ShowMainPage();
         }
     }
 }
