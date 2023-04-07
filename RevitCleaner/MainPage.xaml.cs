@@ -478,7 +478,7 @@ namespace RevitCleaner
                     IsSelected = true,
                     IsShowed = showed,
                     Type= eit,
-                    Size = file.Length / 8
+                    Size = file.Length
                 };
 
                 ViewModel.ExplorerItems.Add(item);

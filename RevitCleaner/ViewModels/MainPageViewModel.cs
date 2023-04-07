@@ -207,7 +207,7 @@ namespace RevitCleaner
 
         public void DisplaySelectedCount()
         {
-            int count = ExplorerItems.Where(x => x.IsSelected).Count();
+            int count = 0;
             long size = 0;
             foreach(ExplorerItem item in ExplorerItems)
             {
