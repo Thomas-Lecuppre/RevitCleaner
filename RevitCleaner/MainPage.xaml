@@ -562,6 +562,10 @@
                 <MenuFlyout
                     Placement="TopEdgeAlignedRight">
                     <MenuFlyoutItem
+                        Text="Português"
+                        Click="MenuFlyoutItem_Click"
+                        Tag="pt" />
+                    <MenuFlyoutItem
                         Text="English"
                         Click="MenuFlyoutItem_Click" 
                         Tag="en"/>

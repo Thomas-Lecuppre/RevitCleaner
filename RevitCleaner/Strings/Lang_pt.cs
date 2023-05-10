@@ -4,189 +4,190 @@ namespace RevitCleaner.Strings
     public class Lang_pt : ILanguage
     {
         public string Id => "pt";
-        public string TranslateAuthor => "-";
-        public string LanguageName => "Português";
+        public string TranslateAuthor => "Traduzido por Carina Maccari Blazius";
+        public string LanguageName => "Português Brasil";
 
         /// <summary>
         /// DEFAULT = Dossier de recherche :
         /// </summary>
         public string DirectoryTextBoxHeader
-            => "Dossier de recherche :";
+            => "Diretório de pesquisa:";
 
         /// <summary>
         /// DEFAULT = Indiquez le dossier dans lequel chercher les éléments à nettoyer.
         /// </summary>
         public string DirectoryTextBoxToolTip
-            => "Indiquez le dossier dans lequel chercher les éléments à nettoyer.";
+            => "Escolha a pasta que contêm os arquivos a serem excluídos.";
 
         /// <summary>
         /// DEFAULT = Ouvrir un explorateur de dossier.
         /// </summary>
         public string SearchButtonTooTip
-            => "Ouvrir un explorateur de dossier.";
+            => "Abrir o explorador de arquivos.";
 
         /// <summary>
         /// DEFAULT = Rafraichir la liste des fichiers du dossier.
         /// </summary>
         public string RefreshButtonToolTip
-            => "Rafraichir la liste des fichiers du dossier.";
+            => "Atualizar a lista de arquivos na pasta.";
 
         /// <summary>
         /// DEFAULT = Filtre de recherche :
         /// </summary>
         public string SearchTextBoxHeader
-            => "Filtre de recherche :";
+            => "Filtro de pesquisa:";
 
         /// <summary>
         /// DEFAULT = Project, Modèle générique, @Etudes
         /// </summary>
         public string SearchTextBoxPlaceHolder
-            => "Project, Modèle générique, @Etudes";
+            => "Projeto, Modelo genérico, @Equipe";
 
         /// <summary>
         /// DEFAULT = 
         /// C'est dans cette zone que vous pouvez filtrer la liste des éléments trouvés.\nSéparez tous vos composants de filtre par \",\".\n\nPour obtenir plus d'informations sur les fonctionnalités et raccourcis possibles appuyez sur \"F1\".
         /// </summary>
         public string SearchTextBoxToolTip
-            => "C'est dans cette zone que vous pouvez filtrer la liste des éléments trouvés.\nSéparez tous vos composants de filtre par \",\".\n\nPour obtenir plus d'informations sur les fonctionnalités et raccourcis possibles appuyez sur \"F1\".";
+            => "Nessa sessão você tem a possibilidade de filtrar a lista de arquivos encontrados.\n " +
+            "Separe todos os arquivos a serem procurados por \",\".\n\n Para obter ajuda e saber mais sobre os atalhos disponíveis, clique em \"F1\".";
 
         /// <summary>
         /// DEFAULT = Recherche stricte activée
         /// </summary>
         public string CaseSensitiveToggleSwitchOn
-            => "Recherche stricte activée";
+            => "Procura precisa ativada";
 
         /// <summary>
         /// DEFAULT = Recherche stricte désactivée
         /// </summary>
         public string CaseSensitiveToggleSwitchOff
-            => "Recherche stricte désactivée";
+            => "Procura precisa desativada";
 
         /// <summary>
         /// DEFAULT = Ouvrir
         /// </summary>
         public string ListItemOpenButtonText
-            => "Ouvrir";
+            => "Abrir";
 
         /// <summary>
         /// DEFAULT = Actions globales :
         /// </summary>
         public string GlobalActionTitle
-            => "Actions globales :";
+            => "Opções gerais :";
 
         /// <summary>
         /// DEFAULT = Tout cocher
         /// </summary>
         public string SelectAllText
-            => "Tout cocher";
+            => "Marcar tudo";
 
         /// <summary>
         /// DEFAULT = Coche tous les éléments sans tenir compte du filtre.
         /// </summary>
         public string SelectAllToolTip
-            => "Coche tous les éléments sans tenir compte du filtre.";
+            => "Marcar todos os arquivos sem levar em consideração o filtro escolhido.";
 
         /// <summary>
         /// DEFAULT = Tout décocher
         /// </summary>
         public string UnSelectAllText
-            => "Tout décocher";
+            => "Desmarcar tudo";
 
         /// <summary>
         /// DEFAULT = Décoche tous les éléments sans tenir compte du filtre.
         /// </summary>
         public string UnSelectAllToolTip
-            => "Décoche tous les éléments sans tenir compte du filtre.";
+            => "Desmarcar todos os arquivos sem levar em consideração o filtro escolhido.";
 
         /// <summary>
         /// DEFAULT = Tout inverser
         /// </summary>
         public string InvertAllText
-            => "Tout inverser";
+            => "Inverter tudo";
 
         /// <summary>
         /// DEFAULT = Inverse la sélection de tous les éléments sans tenir compte du filtre.
         /// </summary>
         public string InvertAllToolTip
-            => "Inverse la sélection de tous les éléments sans tenir compte du filtre.";
+            => "Inverter todos os arquivos sem levar em consideração o filtro escolhido.";
 
         /// <summary>
         /// DEFAULT = Actions sur la sélection :
         /// </summary>
         public string FilteredActionTiTle
-            => "Actions sur la sélection :";
+            => "Opções sobre a seleção :";
 
         /// <summary>
         /// DEFAULT = Cocher filtrés
         /// </summary>
         public string FilteredSelectAllText
-            => "Cocher filtrés";
+            => "Marcar filtrados";
 
         /// <summary>
         /// DEFAULT = Coche tout les éléments filtrés.
         /// </summary>
         public string FilteredSelectAllToolTip
-            => "Coche tout les éléments filtrés.";
+            => "Marcar todos os arquivos filtrados.";
 
         /// <summary>
         /// DEFAULT = Décocher filtrés
         /// </summary>
         public string FilteredUnSelectAllText
-            => "Décocher filtrés";
+            => "Desmarcar filtrados";
 
         /// <summary>
         /// DEFAULT = Décoche tout les éléments filtrés.
         /// </summary>
         public string FilteredUnSelectAllToolTip
-            => "Décoche tout les éléments filtrés.";
+            => "Desmarcar todos os arquivos filtrados.";
 
         /// <summary>
         /// DEFAULT = Inverser filtrés
         /// </summary>
         public string FilteredInvertAllText
-            => "Inverser filtrés";
+            => "Inverter filtrados";
 
         /// <summary>
         /// DEFAULT = Inverse la sélection de tout les éléments filtrés.
         /// </summary>
         public string FilteredInvertAllToolTip
-            => "Inverse la sélection de tout les éléments filtrés.";
+            => "Inverter todos os arquivos filtrados.";
 
         /// <summary>
         /// DEFAULT = Générer un rapport de suppression
         /// </summary>
         public string DeleteReportSwitchOn
-            => "Générer un rapport de suppression";
+            => "Gerar um relatório de arquivos excluídos";
 
         /// <summary>
         /// DEFAULT = Ne pas générer de rapport de suppression
         /// </summary>
         public string DeleteReportSwitchOff
-            => "Ne pas générer de rapport de suppression";
+            => "Não gerar um relatório de arquivos excluídos";
 
         /// <summary>
         /// DEFAULT = Les rapports de suppresion se trouve dans ..\\Mes Documents\\Revit Cleaner Reports
         /// </summary>
         public string DeleteReportSwitchToolTip
-            => "Les rapports de suppresion se trouve dans ..\\Mes Documents\\Revit Cleaner Reports";
+            => "Os relatório de arquivos excluídos se encontram em ..\\Meus Documentos\\Revit Cleaner Reports";
 
         /// <summary>
         /// DEFAULT = Cette action est irréversible. Réfléchissez avant de cliquer.
         /// </summary>
         public string DeleteButtonToolTip
-            => "Cette action est irréversible. Réfléchissez avant de cliquer.";
+            => "Essa ação é irreversível. Você tem certeza que deseja continuar?";
 
         /// <summary>
         /// DEFAULT = Presser une seconde fois pour confirmer
         /// </summary>
         public string DeleteButtonConfirmMessage
-            => "Presser une seconde fois pour confirmer";
+            => "Clique mais uma vez para confirmar";
 
         /// <summary>
         /// DEFAULT = Une erreur c'est produite. Veuillez redémarrer votre ordinateur puis retenter la mise à jour. Si le problème persiste, communiquez ce code erreur : $1
         /// </summary>
         public string UpdateErrorMessage
-            => "Une erreur c'est produite. Veuillez redémarrer votre ordinateur puis retenter la mise à jour. Si le problème persiste, communiquez ce code erreur : $1";
+            => "Houve um erro. Reinicie seu computador e verifique se existe uma atualização. Se o problema persistir, comunique esse código de erro : $1";
 
         #region Common
 
@@ -194,57 +195,57 @@ namespace RevitCleaner.Strings
         /// DEFAULT = Aucun fichier à afficher
         /// </summary>
         public string StrNoFile
-            => "Aucun fichier à afficher";
+            => "Nenhum arquivo a ser apresentado na pasta";
 
         /// <summary>
         /// DEFAULT = Auncun fichier affiché
         /// </summary>
         public string StrNoShowedFile
-            => "Auncun fichier affiché";
+            => "Nenhum arquivo encontrado";
 
         /// <summary>
         /// DEFAULT = 1 fichier affiché
         /// </summary>
         public string StrOneShowedFile
-            => "1 fichier affiché";
+            => "1 arquivo encontrado";
 
         /// <summary>
         /// DEFAULT = $1 fichiers affichés
         /// $1 représente le nombre de fichiers qui correspondent au tri
         /// </summary>
         public string StrMultipleShowedFile
-            => "$1 fichiers affichés";
+            => "$1 arquivos encontrados";
 
         /// <summary>
         /// DEFAULT = fichier
         /// </summary>
         public string StrFile
-            => "fichier";
+            => "arquivo";
 
         /// <summary>
         /// DEFAULT = fichiers
         /// </summary>
         public string StrFiles
-            => "fichiers";
+            => "arquivos";
 
         /// <summary>
         /// DEFAULT = Recherche dans :
         /// </summary>
         public string StrLookInto
-            => "Recherche dans :";
+            => "Pesquisar em :";
 
         /// <summary>
         /// DEFAULT = Aucun fichier à nettoyer
         /// </summary>
         public string StrNoFileToClean
-            => "Aucun fichier à nettoyer";
+            => "Nenhum arquivo a ser excluído";
 
         /// <summary>
         /// DEFAULT = Aucun fichier à nettoyer
         /// $1 représente la taille du fichier à nettoyer
         /// </summary>
         public string StrOneFileToClean
-            => "Nettoyer le fichier - $1";
+            => "Excluir o arquivo - $1";
 
         /// <summary>
         /// DEFAULT = Aucun fichier à nettoyer
@@ -252,7 +253,7 @@ namespace RevitCleaner.Strings
         /// $2 représente la taille totale des fichiers à nettoyer
         /// </summary>
         public string StrMultipleToClean
-            => "Nettoyer $1 fichiers - $2";
+            => "Excluir $1 arquivos - $2";
 
         /// <summary>
         /// DEFAULT = Mettre à jour Revit Cleaner $1 vers $2
@@ -260,31 +261,31 @@ namespace RevitCleaner.Strings
         /// $2 représente la dernière version disponible en ligne
         /// </summary>
         public string StrUpdateTo
-            => "Mettre à jour Revit Cleaner $1 vers $2";
+            => "Atualizae Revit Cleaner $1 para a versão $2";
 
         /// <summary>
         /// DEFAULT = Installer
         /// </summary>
         public string StrInstall
-            => "Installer";
+            => "Instalar";
 
         /// <summary>
         /// DEFAULT = Continuer
         /// </summary>
         public string StrContinue
-            => "Continuer";
+            => "Continuar";
 
         /// <summary>
         /// DEFAULT = Ignorer cette mise à jour
         /// </summary>
         public string StrSkip
-            => "Ignorer cette mise à jour";
+            => "Ignorar essa atualização";
 
         /// <summary>
         /// DEFAULT = Note de mise à jour :
         /// </summary>
         public string StrPatchNote
-            => "Note de mise à jour :";
+            => "Nota da atualização :";
 
         #endregion
     }
